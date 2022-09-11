@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2022-09-11T14:52:33.110Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36 Edg/105.0.1343.27" etag="5I02b0Rs45CTpWNmaz-4" version="20.3.0" type="github">
+<mxfile host="app.diagrams.net" modified="2022-09-11T14:53:37.570Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36 Edg/105.0.1343.27" etag="faH50WB1vQKaexNGe1Dt" version="20.3.0" type="github">
   <diagram id="onzAAhzehpa1OVPJ_8Cz" name="第 1 页">
     <mxGraphModel dx="1669" dy="1979" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -264,7 +264,7 @@
             <mxRectangle width="60" height="70" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="BWMmNf6PYko1sWTr96Bo-72" value="顾客ID&#xa;评论ID" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;fontStyle=5;overflow=hidden;" vertex="1" parent="BWMmNf6PYko1sWTr96Bo-70">
+        <mxCell id="BWMmNf6PYko1sWTr96Bo-72" value="顾客ID&#xa;评论ID&#xa;酒店ID&#xa;房型ID&#xa;房间ID" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;fontStyle=5;overflow=hidden;" vertex="1" parent="BWMmNf6PYko1sWTr96Bo-70">
           <mxGeometry x="60" width="120" height="70" as="geometry">
             <mxRectangle width="120" height="70" as="alternateBounds" />
           </mxGeometry>
@@ -277,7 +277,7 @@
             <mxRectangle width="60" height="30" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="BWMmNf6PYko1sWTr96Bo-75" value="房间ID" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;" vertex="1" parent="BWMmNf6PYko1sWTr96Bo-73">
+        <mxCell id="BWMmNf6PYko1sWTr96Bo-75" value="" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;" vertex="1" parent="BWMmNf6PYko1sWTr96Bo-73">
           <mxGeometry x="60" width="120" height="30" as="geometry">
             <mxRectangle width="120" height="30" as="alternateBounds" />
           </mxGeometry>
@@ -290,7 +290,7 @@
             <mxRectangle width="60" height="160" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="BWMmNf6PYko1sWTr96Bo-78" value="酒店ID&#xa;&#xa;订房时间&#xa;退房时间" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;" vertex="1" parent="BWMmNf6PYko1sWTr96Bo-76">
+        <mxCell id="BWMmNf6PYko1sWTr96Bo-78" value="&#xa;&#xa;订房时间&#xa;退房时间" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;" vertex="1" parent="BWMmNf6PYko1sWTr96Bo-76">
           <mxGeometry x="60" width="120" height="160" as="geometry">
             <mxRectangle width="120" height="160" as="alternateBounds" />
           </mxGeometry>
