@@ -14,4 +14,4 @@ spring:
 #        hbm2ddl:
 #          auto: create
 server:
-  port: 8484
+  port: 8888
