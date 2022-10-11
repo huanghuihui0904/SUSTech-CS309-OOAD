@@ -41,7 +41,7 @@ public class HotelWishListHandler {
   @PostMapping("insert")
   public String insert(@RequestBody HotelWishList hotelWishList) {
     Integer maxId = jdbcTemplate.queryForObject("select MAX(hotelwishlistid) from hotelwishlist", Integer.class);
-hotelWishList.setHotelwishlistid(maxId);
+hotelWishList.setHotelwishlistid(maxId+1);
 
     HotelWishList result = hotelWishListRepository.save(hotelWishList);
     if(result!=null){

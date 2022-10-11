@@ -36,7 +36,7 @@ public class HotelHandler {
   @PostMapping("insert")
   public String insert(@RequestBody Hotel hotel) {
     Integer maxId = jdbcTemplate.queryForObject("select MAX(hotelid) from hotel", Integer.class);
-hotel.setHotelid(maxId);
+hotel.setHotelid(maxId+1);
 
     Hotel result = hotelRepository.save(hotel);
     if(result!=null){

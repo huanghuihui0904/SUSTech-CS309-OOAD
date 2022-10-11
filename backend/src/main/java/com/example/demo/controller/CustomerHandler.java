@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.entity.Chat;
 import com.example.demo.entity.Customer;
 import com.example.demo.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +18,8 @@ public class CustomerHandler {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
-    @RequestMapping(value = "/getbyid/{id}",method = RequestMethod.GET)
-    public Customer getbyid(@PathVariable Integer id){
+    @RequestMapping(value = "/getbyid",method = RequestMethod.GET)
+    public Customer getbyid(@RequestParam("id") int id){
         Customer customer=  customerRepository.findAllByCustomerid(id);
         return customer;
     }
@@ -29,8 +30,8 @@ public class CustomerHandler {
         return customers;
     }
 
-    @GetMapping("/deletebyid/{id}")
-    public String deletebyid(@PathVariable("id") int id){
+    @PostMapping("/deletebyid")
+    public String deletebyid(@RequestParam("id") int id){
         // 删除语句
         String sql = "delete from customer where customerid=?";
         jdbcTemplate.update(sql,id);
@@ -41,17 +42,17 @@ public class CustomerHandler {
 
 
 
-    @GetMapping("/insert/{hotelwishlistid}/{roomtypewishlistid}/{name}/{loginpassword}/{telephone}/{money}/{credits}")
-    public String insert2(@PathVariable("hotelwishlistid")int hotelwishlistid,@PathVariable("roomtypewishlistid") String roomtypewishlistid,
-                          @PathVariable("name")String name,@PathVariable("loginpassword")String loginpassword,
-                          @PathVariable("telephone")String telephone,@PathVariable("money")int money,
-                          @PathVariable("credits")int credits){
+    @PostMapping("/insert")
+    public String insert2(@RequestBody Customer customer){
 
         Integer maxId = jdbcTemplate.queryForObject("select MAX(customerid) from customer", Integer.class);
-        String sql = "insert into customer values (?,?,?,?,?,?,?,?);";
-        jdbcTemplate.update(sql,((int)maxId+1),hotelwishlistid,roomtypewishlistid,name,loginpassword,telephone,money,credits);
-
-        return "insert ok "+maxId;
+      customer.setCustomerid(maxId+1);
+        Customer result = customerRepository.save(customer);
+        if(result!=null){
+            return "insert ok";
+        }else {
+            return "insert fail";
+        }
     }
 
 }

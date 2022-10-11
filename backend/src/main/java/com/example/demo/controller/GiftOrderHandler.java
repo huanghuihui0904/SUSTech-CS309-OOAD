@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 
+import com.example.demo.entity.Chat;
 import com.example.demo.entity.GiftOrder;
 import com.example.demo.repository.GiftOrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +20,8 @@ public class GiftOrderHandler {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
-    @RequestMapping(value = "/getbyid/{id}",method = RequestMethod.GET)
-    public GiftOrder getbyid(@PathVariable Integer id){
+    @RequestMapping(value = "/getbyid",method = RequestMethod.GET)
+    public GiftOrder getbyid(@RequestParam("id") int id){
         GiftOrder giftOrder=  giftOrderRepository.findGiftOrderByGiftorderid(id);
         return giftOrder;
     }
@@ -31,16 +32,16 @@ public class GiftOrderHandler {
         return giftOrders;
     }
 
-    @GetMapping("/deletebygiftorderid/{id}")
-    public String deletebygiftorderid(@PathVariable("id") int id){
+    @PostMapping("/deletebygiftorderid")
+    public String deletebygiftorderid(@RequestParam("id") int id){
         // 删除语句
         String sql = "delete from giftorder where giftorderid=?";
         jdbcTemplate.update(sql,id);
         // 查询
         return "delete by id Ok";
     }
-    @GetMapping("/deletebycustomerid/{id}")
-    public String deletebycustomerid(@PathVariable("id") int id){
+    @PostMapping("/deletebycustomerid")
+    public String deletebycustomerid(@RequestParam("id") int id){
         // 删除语句
         String sql = "delete from giftorder where customerid=?";
         jdbcTemplate.update(sql,id);
@@ -53,15 +54,17 @@ public class GiftOrderHandler {
 
 
 
-    @GetMapping("/insert/{customerid}/{giftid}/{amount}/{ordertime}")
-    public String insert2(@PathVariable("customerid")int customerid,@PathVariable("giftid") int giftid,
-                          @PathVariable("amount")int amount,@PathVariable("ordertime")String ordertime){
+    @PostMapping("/insert")
+    public String insert(@RequestBody GiftOrder giftOrder){
 
         Integer maxId = jdbcTemplate.queryForObject("select MAX(giftorderid) from giftorder", Integer.class);
-        String sql = "insert into giftorder values (?,?,?,?,?);";
-        jdbcTemplate.update(sql,((int)maxId+1),customerid,giftid,amount,ordertime);
-
-        return "insert ok "+maxId;
+        giftOrder.setGiftorderid(maxId+1);
+        GiftOrder result = giftOrderRepository.save(giftOrder);
+        if(result!=null){
+            return "insert ok";
+        }else {
+            return "insert fail";
+        }
     }
 
 }

@@ -42,7 +42,7 @@ public class RoomTypeWishListHandler {
   public String insert(@RequestBody RoomTypeWishList roomTypeWishList) {
 
     Integer maxId = jdbcTemplate.queryForObject("select MAX(roomtypewishlistid) from roomtypewishlist", Integer.class);
-roomTypeWishList.setRoomtypewishlistid(maxId);
+roomTypeWishList.setRoomtypewishlistid(maxId+1);
     RoomTypeWishList result = roomTypeWishListRepository.save(roomTypeWishList);
     if(result!=null){
       return "insert ok";

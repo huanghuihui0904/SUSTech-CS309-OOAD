@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 
+import com.example.demo.entity.Chat;
 import com.example.demo.entity.Orders;
 import com.example.demo.repository.OrdersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +20,8 @@ public class OrdersHandler {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
-    @RequestMapping(value = "/getbyid/{id}",method = RequestMethod.GET)
-    public Orders getbyid(@PathVariable Integer id){
+    @RequestMapping(value = "/getbyid",method = RequestMethod.GET)
+    public Orders getbyid(@RequestParam("id") int id){
         Orders gift=  ordersRepository.findOrderByOrderid(id);
         return gift;
     }
@@ -31,8 +32,8 @@ public class OrdersHandler {
         return gifts;
     }
 
-    @GetMapping("/deletebyid/{id}")
-    public String deletebyid(@PathVariable("id") int id){
+    @PostMapping("/deletebyid")
+    public String deletebyid(@RequestParam("id") int id){
         // 删除语句
         String sql = "delete from orders where orderid=?";
         jdbcTemplate.update(sql,id);
@@ -43,28 +44,19 @@ public class OrdersHandler {
 
 
 
-    @GetMapping("/insert/{customerid}/{commentid}/{hotelid}/{roomtypeid}/{roomid}/{ordertime}")
-    public String insert2(@PathVariable("customerid")int customerid,@PathVariable("commentid") int commentid,
-                          @PathVariable("hotelid")int hotelid,@PathVariable("roomtypeid")int roomtypeid,
-                          @PathVariable("roomid")int roomid,@PathVariable("ordertime")String ordertime){
+    @PostMapping("/insert")
+    public String insert2(@RequestBody Orders orders){
 
         Integer maxId = jdbcTemplate.queryForObject("select MAX(orderid) from orders", Integer.class);
-        String sql = "insert into orders values (?,?,?,?,?,?,?);";
-        jdbcTemplate.update(sql,((int)maxId+1),customerid,commentid,hotelid,roomtypeid,roomid,ordertime);
-
-        return "insert ok "+maxId;
+        orders.setOrderid(maxId+1);
+        Orders result = ordersRepository.save(orders);
+        if(result!=null){
+            return "insert ok";
+        }else {
+            return "insert fail";
+        }
     }
 
-    @GetMapping("/insert/{customerid}/{hotelid}/{roomtypeid}/{roomid}/{ordertime}")
-    public String insert3(@PathVariable("customerid")int customerid,@PathVariable("hotelid")int hotelid,
-                          @PathVariable("roomtypeid")int roomtypeid,
-                          @PathVariable("roomid")int roomid,@PathVariable("ordertime")String ordertime){
 
-        Integer maxId = jdbcTemplate.queryForObject("select MAX(orderid) from orders", Integer.class);
-        String sql = "insert into orders(orderid, customerid, hotelid, roomtypeid, roomid, ordertime) values (?,?,?,?,?,?);";
-        jdbcTemplate.update(sql,((int)maxId+1),customerid,hotelid,roomtypeid,roomid,ordertime);
-
-        return "insert ok "+maxId;
-    }
 
 }

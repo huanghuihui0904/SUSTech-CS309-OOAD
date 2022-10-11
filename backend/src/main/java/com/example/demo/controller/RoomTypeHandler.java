@@ -41,7 +41,7 @@ public class RoomTypeHandler {
   public String insert(@RequestBody RoomType roomType) {
 
     Integer maxId = jdbcTemplate.queryForObject("select MAX(roomtypeid) from roomtype", Integer.class);
-    roomType.setRoomtypeid(maxId);
+    roomType.setRoomtypeid(maxId+1);
     RoomType result = roomTypeRepository.save(roomType);
     if(result!=null){
       return "insert ok";

@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.entity.Chat;
 import com.example.demo.entity.Gift;
 import com.example.demo.repository.GiftRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +17,8 @@ public class GiftHandler {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
-    @RequestMapping(value = "/getbyid/{id}",method = RequestMethod.GET)
-    public Gift getbyid(@PathVariable Integer id){
+    @RequestMapping(value = "/getbyid",method = RequestMethod.GET)
+    public Gift getbyid(@RequestParam("id") int id){
         Gift gift=  giftRepository.findGiftByGiftid(id);
         return gift;
     }
@@ -28,22 +29,8 @@ public class GiftHandler {
         return gifts;
     }
 
-    @GetMapping("/deletebyname/{name}")
-    public String deleteByName(@PathVariable("name") String name){
-        String sql = "delete from gift where giftname=?";
-        jdbcTemplate.update(sql,name);
-        // 查询
-        return "delete by name Ok";
-    }
-
-//    @GetMapping("/deletebyid/{id}")
-//    public String deleteByID(Integer id){
-//        giftRepository.deleteGiftByGiftid(id);
-//        return "delete ok";
-//
-//    }
-    @GetMapping("/deletebygiftid/{id}")
-    public String deletebyid(@PathVariable("id") int id){
+    @PostMapping("/deletebygiftid")
+    public String deletebyid(@RequestParam("id") int id){
         // 删除语句
         String sql = "delete from gift where giftid=?";
         jdbcTemplate.update(sql,id);
@@ -51,22 +38,17 @@ public class GiftHandler {
         return "delete by id Ok";
     }
 
-    @GetMapping("/deletebycredit/{credit}")
-    public String deletebycredit(@PathVariable("credit") int credit){
-        // 删除语句
-        String sql = "delete from gift where credits=?";
-        jdbcTemplate.update(sql,credit);
-        // 查询
-        return "delete by credit Ok";
-    }
 
-    @GetMapping("/insert/{id}/{name}/{credit}")
-    public String insert(@PathVariable("id") int id,@PathVariable("name")String name,@PathVariable("credit") int credit){
-        // 删除语句
-        String sql = "insert into gift values (?,?,?);";
-        jdbcTemplate.update(sql,id,name,credit);
-        // 查询
-        return "insert ok";
+    @PostMapping("/insert")
+    public String insert(@RequestBody Gift gift){
+        Integer maxId = jdbcTemplate.queryForObject("select MAX(giftid) from gift", Integer.class);
+        gift.setGiftid(maxId+1);
+        Gift result = giftRepository.save(gift);
+        if(result!=null){
+            return "insert ok";
+        }else {
+            return "insert fail";
+        }
     }
 
 

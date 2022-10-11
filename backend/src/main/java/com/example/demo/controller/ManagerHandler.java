@@ -42,7 +42,7 @@ public class ManagerHandler {
   public String insert(@RequestBody Manager manager) {
 
     Integer maxId = jdbcTemplate.queryForObject("select MAX(managerid) from manager", Integer.class);
-manager.setManagerid(maxId);
+manager.setManagerid(maxId+1);
     Manager result = managerRepository.save(manager);
     if(result!=null){
       return "insert ok";
