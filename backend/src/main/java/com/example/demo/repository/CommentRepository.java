@@ -11,10 +11,10 @@ import java.util.List;
 
 public interface CommentRepository extends JpaRepository<Comment, Integer> {
 
-//    @Select( "select * from comment where commentid=#{id}")
+    //    @Select( "select * from comment where commentid=#{id}")
     public Comment findAllByCommentid(Integer id);
 
-//    @Query(value = "select * from comment",nativeQuery = true)
+    //    @Query(value = "select * from comment",nativeQuery = true)
     public List<Comment> findAll();
 
 

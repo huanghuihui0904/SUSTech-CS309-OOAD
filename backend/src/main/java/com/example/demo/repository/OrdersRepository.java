@@ -8,9 +8,9 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface OrdersRepository extends JpaRepository<Orders,Integer> {
-//    @Select( "select * from orders where orderid=#{id}")
+    //    @Select( "select * from orders where orderid=#{id}")
     public Orders findOrderByOrderid (Integer id);
 
-//    @Query(value = "select * from orders",nativeQuery = true)
+    //    @Query(value = "select * from orders",nativeQuery = true)
     public List<Orders> findAll();
 }
