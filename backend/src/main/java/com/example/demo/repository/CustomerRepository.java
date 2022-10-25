@@ -9,9 +9,9 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface CustomerRepository extends JpaRepository<Customer,Integer> {
-//    @Select( "select * from customer where customerid=#{id}")
+    //    @Select( "select * from customer where customerid=#{id}")
     public Customer findAllByCustomerid(Integer id);
 
-//    @Query(value = "select * from customer",nativeQuery = true)
+    //    @Query(value = "select * from customer",nativeQuery = true)
     public List<Customer> findAll();
 }

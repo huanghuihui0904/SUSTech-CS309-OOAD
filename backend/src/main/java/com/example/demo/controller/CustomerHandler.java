@@ -46,7 +46,7 @@ public class CustomerHandler {
     public String insert2(@RequestBody Customer customer){
 
         Integer maxId = jdbcTemplate.queryForObject("select MAX(customerid) from customer", Integer.class);
-      customer.setCustomerid(maxId+1);
+        customer.setCustomerid(maxId+1);
         Customer result = customerRepository.save(customer);
         if(result!=null){
             return "insert ok";

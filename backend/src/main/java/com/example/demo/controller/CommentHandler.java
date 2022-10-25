@@ -44,6 +44,8 @@ public class CommentHandler {
         jdbcTemplate.update(sql,id);
         // 查询
         return "delete by id Ok";
+
+
     }
 
 
