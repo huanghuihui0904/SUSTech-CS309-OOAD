@@ -23,35 +23,35 @@ public class RoomTypeWishListHandler {
   @Autowired
   JdbcTemplate jdbcTemplate;
 
-  @RequestMapping(value = "/getbyid", method = RequestMethod.GET)
+  @GetMapping()
   public RoomTypeWishList getbyid(@RequestParam("id") int id) {
     RoomTypeWishList roomTypeWishList = roomTypeWishListRepository.findRoomTypeWishListByRoomtypewishlistid(id);
     return roomTypeWishList;
   }
-
-  @GetMapping("/findAll")
-  public List findAll() {
-    List<RoomTypeWishList> roomTypeWishLists = roomTypeWishListRepository.findAll();
-    return roomTypeWishLists;
-  }
-
-
-
-
-  @PostMapping("insert")
-  public String insert(@RequestBody RoomTypeWishList roomTypeWishList) {
-
-    Integer maxId = jdbcTemplate.queryForObject("select MAX(roomtypewishlistid) from roomtypewishlist", Integer.class);
-roomTypeWishList.setRoomtypewishlistid(maxId+1);
-    RoomTypeWishList result = roomTypeWishListRepository.save(roomTypeWishList);
-    if(result!=null){
-      return "insert ok";
-    }else {
-      return "insert fail";
-    }
-
-
-  }
+//
+//  @GetMapping("/findAll")
+//  public List findAll() {
+//    List<RoomTypeWishList> roomTypeWishLists = roomTypeWishListRepository.findAll();
+//    return roomTypeWishLists;
+//  }
+//
+//
+//
+//
+//  @PostMapping("insert")
+//  public String insert(@RequestBody RoomTypeWishList roomTypeWishList) {
+//
+//    Integer maxId = jdbcTemplate.queryForObject("select MAX(roomtypewishlistid) from roomtypewishlist", Integer.class);
+//roomTypeWishList.setRoomtypewishlistid(maxId+1);
+//    RoomTypeWishList result = roomTypeWishListRepository.save(roomTypeWishList);
+//    if(result!=null){
+//      return "insert ok";
+//    }else {
+//      return "insert fail";
+//    }
+//
+//
+//  }
 
 
 }

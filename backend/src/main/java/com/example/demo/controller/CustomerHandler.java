@@ -18,7 +18,7 @@ public class CustomerHandler {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
-    @RequestMapping(value = "/getbyid",method = RequestMethod.GET)
+    @GetMapping()
     public Customer getbyid(@RequestParam("id") int id){
         Customer customer=  customerRepository.findAllByCustomerid(id);
         return customer;

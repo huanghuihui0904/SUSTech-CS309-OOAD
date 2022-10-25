@@ -23,34 +23,34 @@ public class RoomTypeHandler {
   @Autowired
   JdbcTemplate jdbcTemplate;
 
-  @RequestMapping(value = "/getbyid", method = RequestMethod.GET)
+  @GetMapping()
   public RoomType getbyid(@RequestParam("id") int id) {
     RoomType roomType = roomTypeRepository.findRoomTypeByRoomtypeid(id);
     return roomType;
   }
 
-  @GetMapping("/findAll")
-  public List findAll() {
-    List<RoomType> roomTypes = roomTypeRepository.findAll();
-    return roomTypes;
-  }
-
-
-
-  @PostMapping("insert")
-  public String insert(@RequestBody RoomType roomType) {
-
-    Integer maxId = jdbcTemplate.queryForObject("select MAX(roomtypeid) from roomtype", Integer.class);
-    roomType.setRoomtypeid(maxId+1);
-    RoomType result = roomTypeRepository.save(roomType);
-    if(result!=null){
-      return "insert ok";
-    }else {
-      return "insert fail";
-    }
-
-
-  }
+//  @GetMapping("/findAll")
+//  public List findAll() {
+//    List<RoomType> roomTypes = roomTypeRepository.findAll();
+//    return roomTypes;
+//  }
+//
+//
+//
+//  @PostMapping("insert")
+//  public String insert(@RequestBody RoomType roomType) {
+//
+//    Integer maxId = jdbcTemplate.queryForObject("select MAX(roomtypeid) from roomtype", Integer.class);
+//    roomType.setRoomtypeid(maxId+1);
+//    RoomType result = roomTypeRepository.save(roomType);
+//    if(result!=null){
+//      return "insert ok";
+//    }else {
+//      return "insert fail";
+//    }
+//
+//
+//  }
 
 
 }

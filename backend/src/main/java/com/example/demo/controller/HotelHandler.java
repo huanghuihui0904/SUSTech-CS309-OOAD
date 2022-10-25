@@ -19,34 +19,34 @@ public class HotelHandler {
   @Autowired
   JdbcTemplate jdbcTemplate;
 
-  @RequestMapping(value = "/getbyid", method = RequestMethod.GET)
+  @GetMapping()
   public Hotel getbyid(@RequestParam("id") int id) {
     Hotel hotel = hotelRepository.findHotelByHotelid(id);
     return hotel;
   }
 
-  @GetMapping("/findAll")
-  public List findAll() {
-    List<Hotel> hotels = hotelRepository.findAll();
-    return hotels;
-  }
-
-
-
-  @PostMapping("insert")
-  public String insert(@RequestBody Hotel hotel) {
-    Integer maxId = jdbcTemplate.queryForObject("select MAX(hotelid) from hotel", Integer.class);
-hotel.setHotelid(maxId+1);
-
-    Hotel result = hotelRepository.save(hotel);
-    if(result!=null){
-      return "insert ok";
-    }else {
-      return "insert fail";
-    }
-
-
-  }
+//  @GetMapping("/findAll")
+//  public List findAll() {
+//    List<Hotel> hotels = hotelRepository.findAll();
+//    return hotels;
+//  }
+//
+//
+//
+//  @PostMapping("/insert")
+//  public String insert(@RequestBody Hotel hotel) {
+//    Integer maxId = jdbcTemplate.queryForObject("select MAX(hotelid) from hotel", Integer.class);
+//hotel.setHotelid(maxId+1);
+//
+//    Hotel result = hotelRepository.save(hotel);
+//    if(result!=null){
+//      return "insert ok";
+//    }else {
+//      return "insert fail";
+//    }
+//
+//
+//  }
 
 
 }

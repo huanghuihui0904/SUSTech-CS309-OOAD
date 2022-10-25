@@ -23,35 +23,35 @@ public class HotelWishListHandler {
   @Autowired
   JdbcTemplate jdbcTemplate;
 
-  @RequestMapping(value = "/getbyid", method = RequestMethod.GET)
+  @GetMapping()
   public HotelWishList getbyid(@RequestParam("id") int id) {
     HotelWishList hotelWishList = hotelWishListRepository.findHotelWishListByHotelwishlistid(id);
     return hotelWishList;
   }
 
-  @GetMapping("/findAll")
-  public List findAll() {
-    List<HotelWishList> hotelWishLists = hotelWishListRepository.findAll();
-    return hotelWishLists;
-  }
-
-
-
-
-  @PostMapping("insert")
-  public String insert(@RequestBody HotelWishList hotelWishList) {
-    Integer maxId = jdbcTemplate.queryForObject("select MAX(hotelwishlistid) from hotelwishlist", Integer.class);
-hotelWishList.setHotelwishlistid(maxId+1);
-
-    HotelWishList result = hotelWishListRepository.save(hotelWishList);
-    if(result!=null){
-      return "insert ok";
-    }else {
-      return "insert fail";
-    }
-
-
-  }
+//  @GetMapping("/findAll")
+//  public List findAll() {
+//    List<HotelWishList> hotelWishLists = hotelWishListRepository.findAll();
+//    return hotelWishLists;
+//  }
+//
+//
+//
+//
+//  @PostMapping("insert")
+//  public String insert(@RequestBody HotelWishList hotelWishList) {
+//    Integer maxId = jdbcTemplate.queryForObject("select MAX(hotelwishlistid) from hotelwishlist", Integer.class);
+//hotelWishList.setHotelwishlistid(maxId+1);
+//
+//    HotelWishList result = hotelWishListRepository.save(hotelWishList);
+//    if(result!=null){
+//      return "insert ok";
+//    }else {
+//      return "insert fail";
+//    }
+//
+//
+//  }
 
 
 }
