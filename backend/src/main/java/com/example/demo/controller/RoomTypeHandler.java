@@ -29,11 +29,11 @@ public class RoomTypeHandler {
     return roomType;
   }
 
-//  @GetMapping("/findAll")
-//  public List findAll() {
-//    List<RoomType> roomTypes = roomTypeRepository.findAll();
-//    return roomTypes;
-//  }
+  @GetMapping("/getAll")
+  public List findAll() {
+    List<RoomType> roomTypes = roomTypeRepository.findAll();
+    return roomTypes;
+  }
 //
 //
 //
