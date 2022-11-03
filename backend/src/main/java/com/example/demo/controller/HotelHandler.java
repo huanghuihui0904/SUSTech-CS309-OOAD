@@ -25,11 +25,11 @@ public class HotelHandler {
     return hotel;
   }
 
-//  @GetMapping("/findAll")
-//  public List findAll() {
-//    List<Hotel> hotels = hotelRepository.findAll();
-//    return hotels;
-//  }
+  @GetMapping("/getAll")
+  public List findAll() {
+    List<Hotel> hotels = hotelRepository.findAll();
+    return hotels;
+  }
 //
 //
 //
