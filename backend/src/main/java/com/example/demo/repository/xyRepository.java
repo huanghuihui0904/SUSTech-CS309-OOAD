@@ -11,6 +11,8 @@ public interface xyRepository extends JpaRepository<xy,Integer> {
   //    @Select( "select * from customer where customerid=#{id}")
 //  public RoomTypeWishList findRoomTypeWishListByRoomtypewishlistid(Integer id);
 
-  //    @Query(value = "select * from customer",nativeQuery = true)
-//  public List<RoomTypeWishList> findAll();
+//      @Query(value = "select * from customer",nativeQuery = true)
+//  public List<xy> findAll();
+
+
 }

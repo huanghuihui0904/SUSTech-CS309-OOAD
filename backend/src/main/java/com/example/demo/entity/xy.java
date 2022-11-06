@@ -12,12 +12,12 @@ import javax.persistence.criteria.CriteriaBuilder;
 
 public class xy {
   @Id
-  Integer x;
+  String time;
   Integer y;
 
 
-  public xy(int j, int i) {
-    this.x=j;
+  public xy(String time, int i) {
+    this.time=time;
     this.y=i;
   }
 }

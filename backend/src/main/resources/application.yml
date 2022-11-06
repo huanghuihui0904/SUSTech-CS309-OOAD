@@ -13,5 +13,20 @@ spring:
 #        dialect: org.hibernate.dialect.PostgreSQLDialect
 #        hbm2ddl:
 #          auto: create
+  jackson:
+    serialization:
+      fail-on-empty-beans: false
+  redis:
+    host: 120.25.216.186
+    port: 6379
+#    timeout: 3
+    password: LInda001
+#    pool:
+#      minIdle: 1
+#      maxIdle: 10
+#      maxWait: 3
+#      maxActive: 8
+
+
 server:
   port: 8888

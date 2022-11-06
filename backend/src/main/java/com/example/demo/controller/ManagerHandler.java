@@ -69,7 +69,7 @@ return nums;
   public List<xy> sales() {
     List<Orders> orders = ordersRepository.findAll();
     List<String[]> orderArray = new ArrayList();
-    int[] year = new int[373];
+    int[][] ymd = new int[5][373];
     for (int i = 0; i < orders.size(); i++) {
       orderArray.add(orders.get(i).toString().split(","));
       for (int j = 0; j < orderArray.get(i).length; j++) {
@@ -78,25 +78,50 @@ return nums;
           String tempt = orderArray.get(i)[j].substring(11, 21);
           System.out.println(tempt);
           String[] time = tempt.split("-");
+          int y=Integer.parseInt(time[0])-2020;
           int m = Integer.parseInt(time[1]);
           int d = Integer.parseInt(time[2]);
           int arr = (m - 1) * 30 + d;
-          year[arr]++;
+          ymd[y][arr]++;
         }
       }
 
 
     }
     List<xy>result=new ArrayList<>();
-    for (int j = 0; j < year.length; j++) {
-      JSONObject js = new JSONObject();
-      xy hh=new xy(j,year[j]);
-      System.out.println(js);
-      result.add(hh);
-//        System.out.println("----" + result[j]);
+    for (int i = 0; i < ymd.length; i++) {
+      for (int j = 0; j <ymd[i].length ; j++) {
+        int m=j/30+1;
+        int d=j-(m-1)*30+1;
+        switch (m){
+          case 1,3,5,7,8,10,12: d++;break;
+          case 2:d=d-2;break;
+        }
+        if((i+2020==2020||i+2020==2024)&&m==2){
+
+          d++;
+        }
+        if(m==13){
+          continue;
+        }
+
+        String time=(i+2020)+"-"+fillZero(m)+"-"+fillZero(d);
+        System.out.println(time);
+        xy re=new xy(time,ymd[i][j]);
+        result.add(re);
+      }
     }
 
+
     return result;
+  }
+
+  public  static String fillZero(int t){
+    if(t<10){
+      return "0"+t;
+    }else {
+      return ""+t;
+    }
   }
 //  @RequestMapping(value = "/getbyid", method = RequestMethod.GET)
 //  public Manager getbyid(@RequestParam("id") int id) {
