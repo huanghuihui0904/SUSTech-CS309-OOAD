@@ -19,12 +19,6 @@ public interface LoginRepository extends JpaRepository<Login,String> {
   @Query(value="select loginpassword from customer where name=?; ",nativeQuery = true)
   String getPassword(String name);
 
-//  @Select("select * from chat")
-//  public List<Chat> findAll();
-
-//    @Delete("delete from gift where giftname=#{name}")
-//    public void deleteChatByChatid
-
 
 
 }

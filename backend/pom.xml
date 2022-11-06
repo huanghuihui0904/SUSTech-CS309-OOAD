@@ -92,6 +92,7 @@
             <artifactId>spring-data-jpa</artifactId>
             <version>2.7.3</version>
         </dependency>
+
         <dependency>
             <groupId>com.auth0</groupId>
             <artifactId>java-jwt</artifactId>
@@ -104,11 +105,7 @@
             <artifactId>simplecaptcha</artifactId>
             <version>1.2.2</version>
         </dependency>
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt</artifactId>
-            <version>0.6.0</version>
-        </dependency>
+
 
          <dependency>
             <groupId>org.springframework.boot</groupId>
