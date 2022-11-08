@@ -10,8 +10,12 @@ import java.util.List;
 
 public interface CustomerRepository extends JpaRepository<Customer,Integer> {
     //    @Select( "select * from customer where customerid=#{id}")
-    public Customer findAllByCustomerid(Integer id);
+    public Customer findByCustomerid(Integer id);
+    public List<Customer> findCustomersByName(String Name);
 
-    //    @Query(value = "select * from customer",nativeQuery = true)
+    public Customer findCustomerByTelephone(String telephone);
+
+    public List<Customer> findCustomersByCustomerid(Integer id);
+    public List<Customer> findCustomersByTelephone(String telephone);
     public List<Customer> findAll();
 }

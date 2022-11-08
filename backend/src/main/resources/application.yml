@@ -4,6 +4,10 @@ spring:
     username: root
     password: 123456
     driver-class-name: org.postgresql.Driver
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
   jpa:
     show-sql: true
     properties:

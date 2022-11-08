@@ -51,7 +51,7 @@ public class CommentHandler {
 
 
     @PostMapping("/insert")
-    public String insert2(@RequestBody Comment comment){
+    public String addComment(@RequestBody Comment comment){
 
         Integer maxId = jdbcTemplate.queryForObject("select MAX(commentid) from comment", Integer.class);
         comment.setCommentid(maxId+1);

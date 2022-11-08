@@ -17,6 +17,7 @@ public class RoomType {
   Integer remain;
   Integer price;
   String introduction;
+  Integer number;
 
 
 }

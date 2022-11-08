@@ -42,7 +42,7 @@ public class EventHandler {
   public String insert(@RequestBody Event event) {
     Integer maxId = jdbcTemplate.queryForObject("select MAX(eventid) from event", Integer.class);
 
-event.setEventid(maxId+1);
+    event.setEventid(maxId+1);
     Event result = eventRepository.save(event);
     if(result!=null){
       return "insert ok";

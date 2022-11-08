@@ -15,4 +15,6 @@ public interface RoomTypeRepository extends JpaRepository<RoomType,Integer> {
 
   //    @Query(value = "select * from orders",nativeQuery = true)
   public List<RoomType> findAll();
+
+  public List<RoomType> findRoomTypesByRoomname(String RoomName);
 }
