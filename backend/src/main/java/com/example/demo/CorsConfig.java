@@ -30,14 +30,14 @@ public class CorsConfig extends WebMvcConfigurationSupport {
    *
    * @param registry
    */
-  @Override
-  public void addInterceptors(InterceptorRegistry registry) {
-    registry.addInterceptor(loginInterceptor)
-        //选择过滤哪些接口
-        .addPathPatterns("/**")
-        //选择忽略的接口
-        .excludePathPatterns("/login");
-    super.addInterceptors(registry);
-  }
+//  @Override
+//  public void addInterceptors(InterceptorRegistry registry) {
+//    registry.addInterceptor(loginInterceptor)
+//        //选择过滤哪些接口
+//        .addPathPatterns("/**")
+//        //选择忽略的接口
+//        .excludePathPatterns("/login");
+//    super.addInterceptors(registry);
+//  }
 
 }
