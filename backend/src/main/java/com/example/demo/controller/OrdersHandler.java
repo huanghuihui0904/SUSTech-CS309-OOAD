@@ -316,17 +316,26 @@ public class OrdersHandler {
 
 
 
-    @PostMapping("/insert")
-    public String insert2(@RequestBody Orders orders){
+    @PostMapping("/booking")
+    public String booking(@RequestParam String startDate,@RequestParam String endDate,@RequestParam String roomType,
+                          @RequestParam String hotelName,@RequestParam String guestsNumber,@RequestParam Integer cost){
+        Integer maxId=jdbcTemplate.queryForObject("select MAX(orderid) from orders", Integer.class);
+        if (maxId==null)maxId=0;
 
-        Integer maxId = jdbcTemplate.queryForObject("select MAX(orderid) from orders", Integer.class);
+
+        Orders orders=new Orders();
         orders.setOrderid(maxId+1);
-        Orders result = ordersRepository.save(orders);
-        if(result!=null){
-            return "insert ok";
-        }else {
-            return "insert fail";
-        }
+
+
+        orders.setOrderid(maxId+1);
+
+//        Orders result = ordersRepository.save(orders);
+//        if(result!=null){
+//            return "insert ok";
+//        }else {
+//            return "insert fail";
+//        }
+        return "ca";
     }
 
 

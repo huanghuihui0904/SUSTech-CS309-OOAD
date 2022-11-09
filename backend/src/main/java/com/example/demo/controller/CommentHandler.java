@@ -25,10 +25,11 @@ public class CommentHandler {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
-    @RequestMapping(value = "/getbyid",method = RequestMethod.GET)
-    public Comment getbyid(@RequestParam("id") int id){
-        Comment comment=  commentRepository.findAllByCommentid(id);
-        return comment;
+
+
+    @GetMapping( "/{id}")
+    public Comment getbyid(@PathVariable("id") int id){
+        return commentRepository.findAllByCommentid(id);
     }
 
     @GetMapping("/findAll")
@@ -54,6 +55,7 @@ public class CommentHandler {
     public String addComment(@RequestBody Comment comment){
 
         Integer maxId = jdbcTemplate.queryForObject("select MAX(commentid) from comment", Integer.class);
+        if (maxId==null)maxId=0;
         comment.setCommentid(maxId+1);
         Comment result = commentRepository.save(comment);
         if(result!=null){

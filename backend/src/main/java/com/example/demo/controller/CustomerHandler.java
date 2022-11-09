@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -124,20 +125,32 @@ public class CustomerHandler {
 
 
     @PostMapping("/createcustomer")
-    public String createCustomer(@RequestBody CustomerInfo customerInfo){
+    public boolean createCustomer(@RequestBody CustomerInfo customerInfo){
 
         Integer maxId = jdbcTemplate.queryForObject("select MAX(customerid) from customer", Integer.class);
+        if (maxId==null)maxId=0;
         Customer customer=new Customer(0,0,customerInfo.getName(),customerInfo.getLoginpassword(),customerInfo.getTelephone(),0,0);
         customer.setCustomerid(maxId+1);
-        Customer result = customerRepository.save(customer);
-        if(result!=null){
-            return "insert ok";
+        List<Customer> customer1=customerRepository.findCustomersByName(customerInfo.getName());
+        List<Customer> customer2=customerRepository.findCustomersByTelephone(customerInfo.getTelephone());
+        Collection<Customer>customers=CollectionUtils.intersection(customer1,customer2);
+        if ( customers.size()==0){
+            Customer result = customerRepository.save(customer);
+            if(result!=null){
+                return true;
+            }else {
+
+
+                return false;
+            }
         }else {
-            return "insert fail";
+            return false;
         }
+
     }
 
     @Data
+    static
     class CustomerInfo{
         private String name;
         private String loginpassword;

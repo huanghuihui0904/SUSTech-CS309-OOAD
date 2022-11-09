@@ -1,7 +1,6 @@
 package com.example.demo.controller;
 
 import com.example.demo.entity.Chat;
-import com.example.demo.entity.Event;
 import com.example.demo.repository.ChatRepository;
 import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,19 +43,9 @@ public class ChatHandler {
     }
 
 
-    @PostMapping("/insert")
-    public String insert(@RequestBody Chat chat){
-        // 删除语句
-        Integer maxId = jdbcTemplate.queryForObject("select MAX(chatid) from chat", Integer.class);
-        chat.setChatid(maxId+1);
-        Chat result = chatRepository.save(chat);
-        if(result!=null){
-            return "insert ok";
-        }else {
-            return "insert fail";
-        }
 
-    }
+
+
 
 
 

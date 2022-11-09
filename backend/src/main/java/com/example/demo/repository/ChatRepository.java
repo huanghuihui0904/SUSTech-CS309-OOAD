@@ -19,6 +19,8 @@ public interface ChatRepository extends JpaRepository<Chat,Integer> {
     @Select("select * from chat")
     public List<Chat> findAll();
 
+
+
 //    @Delete("delete from gift where giftname=#{name}")
 //    public void deleteChatByChatid
 

@@ -42,6 +42,7 @@ public class GiftHandler {
     @PostMapping("/insert")
     public String insert(@RequestBody Gift gift){
         Integer maxId = jdbcTemplate.queryForObject("select MAX(giftid) from gift", Integer.class);
+        if (maxId==null)maxId=0;
         gift.setGiftid(maxId+1);
         Gift result = giftRepository.save(gift);
         if(result!=null){

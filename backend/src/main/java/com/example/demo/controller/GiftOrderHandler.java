@@ -68,6 +68,7 @@ public class GiftOrderHandler {
         String ordertime=format.format(now);
 
         Integer maxId = jdbcTemplate.queryForObject("select MAX(giftorderid) from giftorder", Integer.class);
+        if (maxId==null)maxId=0;
         GiftOrder giftOrder=new GiftOrder(customerid,giftid,amount,ordertime,giftOrderInfo.getAddress());
 
         giftOrder.setGiftorderid(maxId+1);
