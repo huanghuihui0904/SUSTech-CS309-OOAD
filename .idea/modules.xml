@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/SUSTech-CS309-OOAD.iml" filepath="$PROJECT_DIR$/.idea/SUSTech-CS309-OOAD.iml" />
-      <module fileurl="file://$PROJECT_DIR$/backend/demo2.iml" filepath="$PROJECT_DIR$/backend/demo2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/demo.iml" filepath="$PROJECT_DIR$/demo.iml" />
     </modules>
   </component>
 </project>
