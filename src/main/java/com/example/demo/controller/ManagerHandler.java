@@ -93,7 +93,13 @@ return nums;
         int m=j/30+1;
         int d=j-(m-1)*30+1;
         switch (m){
-          case 1,3,5,7,8,10,12: d++;break;
+          case 1:d++;break;
+          case 3:d++;break;
+          case 5:d++;break;
+          case 7:d++;break;
+          case 8:d++;break;
+          case  10:d++;break;
+          case 12: d++;break;
           case 2:d=d-2;break;
         }
         if((i+2020==2020||i+2020==2024)&&m==2){
