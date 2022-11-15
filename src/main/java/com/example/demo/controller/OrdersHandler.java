@@ -349,6 +349,16 @@ public class OrdersHandler {
         return ordersRepository.findOrderByOrderid(id);
     }
 
+    //todo test 高并发
+    @PostMapping("/test")
+    public int orderRoom(){
+        String sql = "update roomtype set remain=remain-1 where roomtypeid=9";
+        int result=jdbcTemplate.update(sql);
+
+return result;
+
+    }
+
 
 
 
@@ -432,6 +442,7 @@ public class OrdersHandler {
             this.customerName = customer.getName();
             this.telephone = customer.getTelephone();
         }
+
     }
 
 
