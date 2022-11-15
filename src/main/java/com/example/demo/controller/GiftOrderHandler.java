@@ -1,7 +1,6 @@
 package com.example.demo.controller;
 
 
-import com.example.demo.entity.Chat;
 import com.example.demo.entity.GiftOrder;
 import com.example.demo.repository.GiftOrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
