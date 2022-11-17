@@ -12,4 +12,7 @@ public class Login {
   @Id
  String name;
   String loginpassword;
+
+
+
 }
