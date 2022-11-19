@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
@@ -139,6 +140,16 @@ public class ManagerHandler {
 
         return result;
     }
+
+    @GetMapping("/customer-time")
+    public void customerTime(@RequestParam("city") String city){
+if(city==null){
+
+}else {
+
+        }
+    }
+
 
     public static String fillZero(int t) {
         if (t < 10) {

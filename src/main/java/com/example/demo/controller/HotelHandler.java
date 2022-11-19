@@ -22,10 +22,15 @@ public class HotelHandler {
   @Autowired
   JdbcTemplate jdbcTemplate;
 
+//  @GetMapping()
+//  public Hotel getbyid(@RequestParam("id") int id) {
+//    Hotel hotel = hotelRepository.findHotelByHotelid(id);
+//    return hotel;
+//  }
   @GetMapping()
-  public Hotel getbyid(@RequestParam("id") int id) {
-    Hotel hotel = hotelRepository.findHotelByHotelid(id);
-    return hotel;
+  public Hotel getbyname(@RequestParam("hotelName") String name) {
+    List<Hotel> hotels = hotelRepository.findHotelsByHotelname(name);
+    return hotels.get(0);
   }
 
   @GetMapping("/getAll")
