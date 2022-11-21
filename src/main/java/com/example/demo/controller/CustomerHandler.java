@@ -52,7 +52,7 @@ public class CustomerHandler {
     List<Customer> customers=customerRepository.findAll();
     if (id!=null){
       List<Customer> customerbyid=  customerRepository.findCustomersByCustomerid(id);
-      customers= (List<Customer>) CollectionUtils.intersection(customers,customerbyid);
+      customers= (List<Customer>) CollectionUtils.union(customers,customerbyid);
       customers=customerbyid;
 
     }
