@@ -250,11 +250,12 @@ public class OrdersHandler {
         List<Orders> orders= ordersRepository.findAll();
         List<OrdersInfoJ> ordersInfoJList=new ArrayList<>();
         for (Orders order:orders){
-            OrdersInfoJ ordersInfojw=new OrdersInfoJ(order);
-            ordersInfoJList.add(ordersInfojw);
+            OrdersInfoJ ordersInfoj=new OrdersInfoJ(order);
+            ordersInfoJList.add(ordersInfoj);
         }
         return ordersInfoJList;
 //        return "nxjkqwnx";
+//        return orders;
     }
 
     @RequestMapping(value = "/ongoing-orders",method = RequestMethod.GET)
@@ -298,14 +299,16 @@ public class OrdersHandler {
 
 
 
-    @RequestMapping(value = "/delete",method = RequestMethod.DELETE)
-    public Orders deleteOrder(@RequestParam("id") int id){
+    @RequestMapping(value = "/delete",method = RequestMethod.POST)
+    public Orders deleteOrder(@RequestParam Integer id){
         // 删除语句
         Orders orders=ordersRepository.findOrderByOrderid(id);
+        if (orders==null)return null;
         String sql = "delete from orders where orderid=?";
         jdbcTemplate.update(sql,id);
         // 查询
         return orders;
+//        return "xna";
     }
 
     @GetMapping(value = "/count")
@@ -365,8 +368,13 @@ return result;
 
 
     @Data
-    class OrdersInfo{
+    static
+    class ID{
+        Integer id;
+    }
 
+    @Data
+    class OrdersInfo{
         Integer orderID;
         String hotelName;
         Integer roomTypeID;
@@ -392,6 +400,7 @@ return result;
     @Data
     class OrdersInfoJ {
 
+
         String customerName;
         String telephone;
         String roomTypeName;
@@ -407,15 +416,26 @@ return result;
             Customer customer=customerRepository.findByCustomerid(customerID);
             this.customerName=customer.getName();
             this.telephone=customer.getTelephone();
-            this.roomTypeName=roomTypeRepository.findRoomTypeByRoomtypeid(roomTypeID).getRoomname();
-            this.hotelName=hotelRepository.findHotelByHotelid(hotelID).getHotelname();
+            RoomType roomType=roomTypeRepository.findRoomTypeByRoomtypeid(roomTypeID);
+            if (roomType==null){
+                this.roomTypeName="null";
+            }else {
+                this.roomTypeName = roomType.getRoomname();
+            }
+            Hotel hotel=hotelRepository.findHotelByHotelid(hotelID);
+            if (hotel==null){
+                this.hotelName="null";
+            }else {
+                this.hotelName=hotelRepository.findHotelByHotelid(hotelID).getHotelname();
+            }
+//            this.hotelName=hotelRepository.findHotelByHotelid(hotelID).getHotelname();
             this.orderTime=orders.getOrdertime();
             this.checkOutTime=orders.getCheckouttime();
             this.checkInTime=orders.getCheckintime();
         }
-
-        public OrdersInfoJ() {
-        }
+//
+//        public OrdersInfoJ() {
+//        }
     }
 
     @Data
