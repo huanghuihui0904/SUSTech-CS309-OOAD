@@ -409,6 +409,7 @@ return result;
         String checkInTime;
         String checkOutTime;
 
+        String cityName;
         public OrdersInfoJ(Orders orders) {
             Integer roomTypeID=orders.getRoomtypeid();
             Integer customerID=orders.getCustomerid();
@@ -421,17 +422,21 @@ return result;
                 this.roomTypeName="null";
             }else {
                 this.roomTypeName = roomType.getRoomname();
+
             }
             Hotel hotel=hotelRepository.findHotelByHotelid(hotelID);
             if (hotel==null){
                 this.hotelName="null";
+                this.cityName="null";
             }else {
                 this.hotelName=hotelRepository.findHotelByHotelid(hotelID).getHotelname();
+                this.cityName=hotel.getCityname();
             }
 //            this.hotelName=hotelRepository.findHotelByHotelid(hotelID).getHotelname();
             this.orderTime=orders.getOrdertime();
             this.checkOutTime=orders.getCheckouttime();
             this.checkInTime=orders.getCheckintime();
+
         }
 //
 //        public OrdersInfoJ() {
@@ -448,6 +453,12 @@ return result;
         String customerName;
         String telephone;
 
+        String ordertime;
+
+        String checkintime;
+
+        String checkouttime;
+
         public OrdersInfoA(Orders order) {
 
             this.orderID = order.getOrderid();
@@ -461,6 +472,10 @@ return result;
             Customer customer=customerRepository.findByCustomerid(customerID);
             this.customerName = customer.getName();
             this.telephone = customer.getTelephone();
+
+            this.ordertime=order.getOrdertime();
+            this.checkintime=order.getCheckintime();
+            this.checkouttime=order.getCheckouttime();
         }
 
     }

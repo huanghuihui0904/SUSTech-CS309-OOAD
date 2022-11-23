@@ -14,19 +14,23 @@ public class GiftOrder {
     @Id
     Integer giftorderid;
     Integer customerid;
-    Integer giftid;
+    String giftname;
     Integer amount;
     String ordertime;
 
     String address;
 
-    public GiftOrder(Integer customerid, Integer giftid, Integer amount, String ordertime,String address) {
+    String recipients;
+
+    public GiftOrder(Integer customerid, String giftName, Integer amount, String ordertime,String address,String recipients) {
 
         this.customerid = customerid;
-        this.giftid = giftid;
+        this.giftname=giftName;
         this.amount = amount;
         this.ordertime = ordertime;
         this.address=address;
+        this.recipients=recipients;
+
     }
 
     public GiftOrder() {
