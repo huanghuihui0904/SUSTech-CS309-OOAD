@@ -343,13 +343,35 @@ public class OrdersHandler {
 
 
     @PutMapping("/modifyOrderTime/{id}")
-    public Orders modifyOrderTime(@PathVariable("id") int id,@RequestParam("checkintime")String checkintime,@RequestParam("checkouttime")String checkouttime){
+    public boolean modifyOrderTime(@PathVariable("id") int id,@RequestParam("checkintime")String checkintime,@RequestParam("checkouttime")String checkouttime) throws ParseException {
+
+        Orders orders=ordersRepository.findOrderByOrderid(id);
+        Integer customerId=orders.getCustomerid();
+        Integer roomtypeId=orders.getRoomtypeid();
+        RoomType roomType=roomTypeRepository.findRoomTypeByRoomtypeid(roomtypeId);
+        Customer customer=customerRepository.findByCustomerid(customerId);
+
+        SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date checkout=format.parse(checkouttime);
+        Date checkin=format.parse(checkintime);
+        int difference= (int) ((checkout.getTime()-checkin.getTime())/(1000*60*60*24));
+        int currentPaid=difference*roomType.getPrice();
+        if (currentPaid<customer.getMoney()){
+            return  false;
+        }
+        if (roomType.getRemain()<0){
+            return  false;
+        }
+
+//        int currentAmount=
+
 
 
         String sql = "update orders set checkintime=? , checkouttime=? where orderid=?";
         jdbcTemplate.update(sql,checkintime,checkouttime,id);
         // 查询
-        return ordersRepository.findOrderByOrderid(id);
+//        return ordersRepository.findOrderByOrderid(id);
+        return true;
     }
 
     //todo test 高并发
