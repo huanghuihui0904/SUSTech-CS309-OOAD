@@ -1,6 +1,7 @@
 package com.example.demo.entity;
 
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
 
@@ -18,6 +19,7 @@ public class RoomType {
   Integer price;
   String introduction;
   Integer number;
+  @Autowired
 public RoomType(){
 
 }
