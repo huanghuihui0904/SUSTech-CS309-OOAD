@@ -8,6 +8,7 @@ import java.util.List;
 public interface GiftOrderRepository extends JpaRepository<GiftOrder,Integer> {
     //    @Select( "select * from giftorder where giftorderid=#{id}")
     public GiftOrder findGiftOrderByGiftorderid (Integer id);
+    public GiftOrder findGiftOrderByGiftname(String giftName);
 
     //    @Query(value = "select * from giftorder",nativeQuery = true)
     public List<GiftOrder> findAll();
