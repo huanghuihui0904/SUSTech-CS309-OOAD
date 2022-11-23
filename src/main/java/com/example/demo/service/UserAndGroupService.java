@@ -12,11 +12,17 @@ public class UserAndGroupService {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
-    // retrieve a list of customers except extractId
+    // retrieve a list of customers except myId
     public List<Map<String, Object>> getAllCustomer() {
         List<Map<String, Object>> getAllCustomer = jdbcTemplate.queryForList(
                 "select * from customer");
         return getAllCustomer;
+    }
+
+    public List<Map<String, Object>> getAllManager() {
+        List<Map<String, Object>> getAllManager = jdbcTemplate.queryForList
+                ("select * from manager");
+        return getAllManager;
     }
 
     // retrieve groups where customer is in

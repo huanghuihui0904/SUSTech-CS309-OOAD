@@ -14,7 +14,7 @@ import java.util.Map;
 
 @RestController
 @CrossOrigin
-@RequestMapping(value = "/chat")
+//@RequestMapping(value = "/chat")
 public class MessageController {
 
     @Autowired
@@ -23,7 +23,7 @@ public class MessageController {
     @Autowired
     UserAndGroupService userAndGroupService;
 
-    @MessageMapping("/{to}")   // if a message is sent to "/chat/{to}", sendMessage is called
+    @MessageMapping("/chat/{to}")   // if a message is sent to "/chat/{to}", sendMessage is called
     public void sendMessagePersonal(@DestinationVariable Integer to, MessageDTO message) {
         messageService.sendMessage(to, message);
     }
@@ -33,7 +33,7 @@ public class MessageController {
         return messageService.getListMessage(from, to);
     }
 
-    @MessageMapping("/group/{to}")  // if a message is sent to "/chat/group/{to}", sendMessage is called
+    @MessageMapping("/chat/group/{to}")  // if a message is sent to "/chat/group/{to}", sendMessage is called
     public void sendMessageToGroup(@DestinationVariable Integer to, MessageGroupDTO message) {
         messageService.sendMessageGroup(to, message);
     }
@@ -43,10 +43,16 @@ public class MessageController {
         return messageService.getListMessageGroups(groupid);
     }
 
+    @GetMapping("/getallmanager")
+    public List<Map<String, Object>> getAllManager() {
+        return userAndGroupService.getAllManager();
+    }
+
     @GetMapping("/getallcustomer")
     public List<Map<String, Object>> getAllCustomer() {
         return userAndGroupService.getAllCustomer();
     }
+
     @GetMapping("/getallgroup/{customerId}")
     public List<Map<String, Object>> getAllGroup(@PathVariable("customerId") Integer customerId) {
         return userAndGroupService.getAllGroup(customerId);
