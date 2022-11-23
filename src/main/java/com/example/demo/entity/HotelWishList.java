@@ -15,6 +15,15 @@ public class HotelWishList {
 
   Integer hotelid;
 
+  Integer customerid;
 
 
+  public HotelWishList(int hotelID, int userID) {
+    this.hotelid=hotelID;
+    this.customerid=userID;
+  }
+
+  public HotelWishList() {
+
+  }
 }

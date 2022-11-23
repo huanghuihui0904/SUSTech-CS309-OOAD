@@ -11,4 +11,6 @@ public interface HotelWishListRepository extends JpaRepository<HotelWishList,Int
 
   //    @Query(value = "select * from customer",nativeQuery = true)
   public List<HotelWishList> findAll();
+
+  public List<HotelWishList> findHotelWishListByCustomerid(Integer id);
 }

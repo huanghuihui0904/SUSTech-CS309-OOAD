@@ -27,9 +27,13 @@ public class LoginHandler {
   JdbcTemplate jdbcTemplate;
 
 
+
   @PostMapping
   public String loginValidate(@RequestBody Login login) {
     String password = loginRepository.getPassword(login.getName());
+    //去数据库找用户id
+//List<Customer>
+    //
     if (login.getLoginpassword() != null && password != null && login.getLoginpassword().equals(password)) {
       String token = jwtToken(login.getName());
       //将token放入redis缓存

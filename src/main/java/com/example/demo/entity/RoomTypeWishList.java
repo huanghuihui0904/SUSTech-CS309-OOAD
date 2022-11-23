@@ -14,6 +14,14 @@ public class RoomTypeWishList {
   Integer roomtypewishlistid;
   Integer hotelid;
   Integer roomtypeid;
+  Integer customerid;
 
+  public RoomTypeWishList(Integer hotelid, Integer roomtypeid, Integer customerid) {
+    this.hotelid = hotelid;
+    this.roomtypeid = roomtypeid;
+    this.customerid = customerid;
+  }
 
+  public RoomTypeWishList() {
+  }
 }
