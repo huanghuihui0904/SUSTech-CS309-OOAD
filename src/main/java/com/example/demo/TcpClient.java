@@ -1,56 +1,50 @@
 package com.example.demo;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.ClassUtils;
 import org.springframework.web.bind.annotation.*;
+import org.thymeleaf.util.StringUtils;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.Socket;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+
 @RestController
 @RequestMapping(value = "/upload")
+@AllArgsConstructor
 public class TcpClient {
 
-    @PostMapping("/picture")
-    public String start(@RequestBody Picture picture) throws IOException {
-//        创建本地流来读取本地文
-        String path= picture.getPath();
-        FileInputStream fis = new FileInputStream(path);
-        int index=path.lastIndexOf("\\");
-        String fileName=path.substring(index+1,path.length());
-        //文件路径自己可以改，注意IDEA中Windows为双斜杠
-        //创建socket
-        Socket socket = new Socket("127.0.0.1",8080);//127.0.0.1为本机ip地址（默认）
-        //获取网络输出流 发送数据
-        OutputStream os = socket.getOutputStream();
-        byte[]head=new byte[1024];
-        byte[] temp=fileName.getBytes();
-        for (int i = 0; i < temp.length; i++) {
-            head[i]=temp[i];
-        }
-        for (int i = temp.length; i <1024 ; i++) {
-            head[i]=(byte)32;
-        }
-        os.write(head);
-        int len = 0;
-        byte[] bytes = new byte[1024];
-        while ((len = fis.read(bytes))!= -1){
-            os.write(bytes);
-        }
 
-        socket.shutdownOutput(); //关闭输出流，否则会堵塞输入流接受
-        // 获取网络输入流接受数据
-        InputStream in = socket.getInputStream();
-        while ((len = in.read(bytes))!= -1){
-            System.out.println(new String(bytes,0,len));
+    @RequestMapping("/stream")
+    public void getStreamData(HttpServletResponse response) {
+        File file=new File("C:\\Users\\pc\\Desktop\\test11\\CKplayer\\CKplayer\\ckplayer\\video\\1_0.mp4");
+        ServletOutputStream out=null;
+        try {
+            FileInputStream instream=new FileInputStream(file);
+            byte[] b=new byte[1024];
+            int length=0;
+            BufferedInputStream buf=new BufferedInputStream(instream);
+            out=response.getOutputStream();
+            BufferedOutputStream bot=new BufferedOutputStream(out);
+            while((length=buf.read(b))!=-1) {
+                bot.write(b,0, b.length);
+            }
+        } catch (Exception  e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
-
-        fis.close();
-        socket.close();
-        return path;
     }
-
 
     @Data
     static
