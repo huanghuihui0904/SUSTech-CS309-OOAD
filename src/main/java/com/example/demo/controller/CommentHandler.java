@@ -1,22 +1,32 @@
 package com.example.demo.controller;
 
 
+import com.example.demo.NonStaticResourceHttpRequestHandler;
 import com.example.demo.entity.Comment;
 import com.example.demo.entity.Hotel;
 import com.example.demo.entity.Orders;
 import com.example.demo.repository.CommentRepository;
 import com.example.demo.repository.HotelRepository;
 import com.example.demo.repository.OrdersRepository;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.util.ClassUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -24,6 +34,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/comment")
+@AllArgsConstructor
 public class CommentHandler {
   @Autowired
   CommentRepository commentRepository;
@@ -36,6 +47,9 @@ public class CommentHandler {
 
   @Autowired
   JdbcTemplate jdbcTemplate;
+
+  @Autowired
+  private final NonStaticResourceHttpRequestHandler nonStaticResourceHttpRequestHandler;
 
 
 
@@ -61,25 +75,24 @@ public class CommentHandler {
 
 
   @GetMapping( "getvideo/{id}")
-  public void getStreamData(HttpServletResponse response,@PathVariable("id") int id) {
+  public void getStreamData(HttpServletRequest request, HttpServletResponse response,@PathVariable("id") int id) throws IOException, ServletException {
     Comment comment=commentRepository.findAllByCommentid(id);
-    File file=new File("D:\\OOADLab\\comment\\"+comment.getVideo());
-    ServletOutputStream out=null;
-    try {
-      FileInputStream instream=new FileInputStream(file);
-      byte[] b=new byte[1024];
-      int length=0;
-      BufferedInputStream buf=new BufferedInputStream(instream);
-      out=response.getOutputStream();
-      BufferedOutputStream bot=new BufferedOutputStream(out);
-      while((length=buf.read(b))!=-1) {
-        bot.write(b,0, b.length);
+    String realPath="D:\\OOADLab\\comment\\"+comment.getVideo();
+    Path filePath = Paths.get(realPath );
+    if (Files.exists(filePath)) {
+      String mimeType = Files.probeContentType(filePath);
+      if (!StringUtils.isEmpty(mimeType)) {
+        response.setContentType(mimeType);
       }
-    } catch (Exception  e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      request.setAttribute(NonStaticResourceHttpRequestHandler.ATTR_FILE, filePath);
+      nonStaticResourceHttpRequestHandler.handleRequest(request, response);
+    } else {
+      response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+      response.setCharacterEncoding(StandardCharsets.UTF_8.toString());
     }
   }
+
+
 
 
   @GetMapping("/getphoto/{id}/{pic}")

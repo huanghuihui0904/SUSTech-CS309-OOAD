@@ -4,8 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-import org.thymeleaf.util.StringUtils;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -24,6 +24,37 @@ import java.util.Arrays;
 @RequestMapping(value = "/upload")
 @AllArgsConstructor
 public class TcpClient {
+
+    @Autowired
+    private final NonStaticResourceHttpRequestHandler nonStaticResourceHttpRequestHandler;
+    @GetMapping("/video/1")
+    public void videoPreview2(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+
+
+
+
+        //假如我把视频1.mp4放在了static下的video文件夹里面
+        //sourcePath 是获取resources文件夹的绝对地址
+        //realPath 即是视频所在的磁盘地址
+        String sourcePath = ClassUtils.getDefaultClassLoader().getResource("").getPath().substring(1);
+        String realPath = "C:\\Users\\pc\\Desktop\\test11\\CKplayer\\CKplayer\\ckplayer\\video\\1_0.mp4";
+
+
+        Path filePath = Paths.get(realPath );
+        if (Files.exists(filePath)) {
+            String mimeType = Files.probeContentType(filePath);
+            if (!StringUtils.isEmpty(mimeType)) {
+                response.setContentType(mimeType);
+            }
+            request.setAttribute(NonStaticResourceHttpRequestHandler.ATTR_FILE, filePath);
+            nonStaticResourceHttpRequestHandler.handleRequest(request, response);
+        } else {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            response.setCharacterEncoding(StandardCharsets.UTF_8.toString());
+        }
+    }
+
 
 
     @RequestMapping("/stream")
