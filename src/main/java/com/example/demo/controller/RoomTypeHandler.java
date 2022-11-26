@@ -37,6 +37,23 @@ public class RoomTypeHandler {
     return roomTypes;
   }
 
+
+
+  @GetMapping("/findByParameter")
+  public List<RoomType> findByParameter(@RequestParam("hotelName") String hotelName) throws UnsupportedEncodingException {
+    System.out.println(hotelName);
+
+    List<Hotel> hotels = hotelRepository.findHotelsByHotelname(hotelName);
+    int hotelId = hotels.get(0).getHotelid();
+    System.out.println(hotelId);
+    List<RoomType> roomTypes = roomTypeRepository.findRoomTypeByHotelid(hotelId);
+
+    return roomTypes;
+  }
+
+
+
+
   @GetMapping("/hotel")
   public List<RoomType> byHotel(@RequestParam("hotelName") String hotelName) throws UnsupportedEncodingException {
     System.out.println(hotelName);
@@ -164,6 +181,16 @@ public class RoomTypeHandler {
     System.out.println(roomTypeId);
     roomTypeRepository.deleteRoomTypeByRoomtypeid(roomTypeId);
     return "delete ok";
+  }
+
+
+
+
+  class roomTypeInfo{
+    String name;
+    Integer area;
+    boolean breakfast;
+
   }
 
 

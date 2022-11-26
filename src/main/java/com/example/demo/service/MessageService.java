@@ -43,9 +43,9 @@ public class MessageService {
         int fromId = messageDTO.getFromLogin();
         String str;
         try {
-            str = jdbcTemplate.queryForObject("select name from customer where customerID = ?;", new Object[]{fromId}, java.lang.String.class);
+            str = jdbcTemplate.queryForObject("select name from customer where customerID = ?;", new Object[]{fromId}, String.class);
         } catch (EmptyResultDataAccessException e) {
-            str = jdbcTemplate.queryForObject("select managername from manager where managerid = ?;", new Object[]{fromId}, java.lang.String.class);
+            str = jdbcTemplate.queryForObject("select managername from manager where managerid = ?;", new Object[]{fromId}, String.class);
         }
         System.out.println("str: " + str);
         jdbcTemplate.update("insert into message(messageFromId, messageFromName, messageToId, messageTime, content) " +

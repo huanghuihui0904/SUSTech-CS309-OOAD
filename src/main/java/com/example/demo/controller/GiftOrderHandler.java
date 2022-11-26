@@ -1,8 +1,10 @@
 package com.example.demo.controller;
 
 
+import com.example.demo.entity.Gift;
 import com.example.demo.entity.GiftOrder;
 import com.example.demo.repository.GiftOrderRepository;
+import com.example.demo.repository.GiftRepository;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -18,6 +20,8 @@ public class GiftOrderHandler {
 
     @Autowired
     GiftOrderRepository giftOrderRepository;
+    @Autowired
+    GiftRepository giftRepository;
 
     @Autowired
     JdbcTemplate jdbcTemplate;
@@ -71,14 +75,11 @@ public class GiftOrderHandler {
         if (maxId==null)maxId=0;
 
         GiftOrder giftOrder=new GiftOrder(customerid,giftName,amount,ordertime,giftOrderInfo.getAddress(),giftOrderInfo.getUsername());
-//
         giftOrder.setGiftorderid(maxId+1);
-        Integer id=maxId+1;
-//
-//        jdbcTemplate.update("insert into giftorder(giftorderid,customerid,giftName,amount,ordertime,address,recipients ) values (?,?,?,?,?,?,?)",id,customerid,giftName,amount,ordertime,giftOrderInfo.getAddress(),giftOrderInfo.getUsername());
+
+
         giftOrderRepository.save(giftOrder);
-//        return giftOrder;
-//        GiftOrder giftOrder1=giftOrderRepository.save(giftOrder);
+
         return "insert ok";
     }
 
