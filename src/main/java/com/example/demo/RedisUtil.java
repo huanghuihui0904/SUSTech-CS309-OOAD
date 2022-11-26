@@ -22,7 +22,14 @@ public class RedisUtil {
 
   @Autowired
   private RedisTemplate<String, Object> redisTemplate;
-
+  /**
+   * 对指定key的键值减一
+   * @param key
+   * @return
+   */
+  public Long decrBy(String key) {
+    return redisTemplate.opsForValue().decrement(key);
+  }
   public RedisUtil(RedisTemplate<String, Object> redisTemplate) {
     this.redisTemplate = redisTemplate;
   }
