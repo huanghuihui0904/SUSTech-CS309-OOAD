@@ -12,15 +12,18 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
@@ -74,10 +77,10 @@ public class CommentHandler {
   }
 
 
-  @GetMapping( "getvideo/{id}")
-  public void getStreamData(HttpServletRequest request, HttpServletResponse response,@PathVariable("id") int id) throws IOException, ServletException {
-    Comment comment=commentRepository.findAllByCommentid(id);
-    String realPath="D:\\OOADLab\\comment\\"+comment.getVideo();
+  @GetMapping( "getvideo/{vid}")
+  public void getStreamData(HttpServletRequest request, HttpServletResponse response,@PathVariable("vid") String vid) throws IOException, ServletException {
+
+    String realPath="D:\\OOADLab\\comment\\"+vid;
     Path filePath = Paths.get(realPath );
     if (Files.exists(filePath)) {
       String mimeType = Files.probeContentType(filePath);
@@ -95,18 +98,13 @@ public class CommentHandler {
 
 
 
-  @GetMapping("/getphoto/{id}/{pic}")
+  @GetMapping("/getphoto/{picname}")
   //path 为图片在服务器的绝对路径
-  public  void getPhoto(HttpServletResponse response,@PathVariable("id") int id,@PathVariable("pic") int pic) throws Exception {
-    Comment comment=commentRepository.findAllByCommentid(id);
-    File file = null;
-    if (pic==1){
-      file=new File("D:\\OOADLab\\comment\\"+comment.getPicture1());
-    }else if (pic==2){
-      file=new File("D:\\OOADLab\\comment\\"+comment.getPicture2());
-    }else if (pic==3){
-      file=new File("D:\\OOADLab\\comment\\"+comment.getPicture3());
-    }
+  public  void getPhoto(HttpServletResponse response,@PathVariable("picname") String picname) throws Exception {
+
+
+     File file=new File("D:\\OOADLab\\comment\\"+picname);
+
 
     FileInputStream fis;
     assert file != null;
@@ -117,7 +115,7 @@ public class CommentHandler {
     fis.read(temp, 0, (int) size);
     fis.close();
     byte[] data = temp;
-    response.setContentType("image/png");
+//    response.setContentType("image/png");
     OutputStream out = response.getOutputStream();
     out.write(data);
     out.flush();
@@ -146,8 +144,9 @@ public class CommentHandler {
 
 
 
-  @PostMapping("/insert")
-  public String addComment(@RequestBody CommentInfo commentInfo) throws IOException {
+  @PostMapping(value = "/insert")
+  @ResponseBody
+  public String addComment(CommentInfo commentInfo) throws IOException {
 
 
     Integer maxId = jdbcTemplate.queryForObject("select MAX(commentid) from comment", Integer.class);
@@ -155,7 +154,7 @@ public class CommentHandler {
 
     Integer commentid =maxId+1;
     Integer score=commentInfo.getScore();
-    String word=commentInfo.getWord();
+    String word=commentInfo.getWords();
     Date now=new Date();
     SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     String commenttime=format.format(now);
@@ -171,41 +170,67 @@ public class CommentHandler {
     jdbcTemplate.update(sql,commentid,orderid);
 
 
-    if (commentInfo.getPicture1()!=null&&commentInfo.getPicture1().length()>0) {
-      String path=commentInfo.getPicture1();
-      int index=path.lastIndexOf(".");
-      String suffix=path.substring(index);
-      start(commentInfo.getPicture1(), commentid +"_picture1"+suffix);
-//      comment.setPicture1(id+"_picture1"+suffix);
-      pic1= commentid +"_picture1"+suffix;
+    if (commentInfo.getPicture1()!=null) {
+      String fileName=commentInfo.getPicture1().getOriginalFilename();
+      int index=fileName.lastIndexOf(".");
+      String suffix=fileName.substring(index);
+      String path="D:\\OOADLab\\comment\\"+commentid +"_picture1"+suffix;
+      File dest = new File(path);
+      //检测是否存在该目录
+//      if (!dest.getParentFile().exists()){
+//        dest.getParentFile().mkdirs();
+//      }
+      //写入文件
+      commentInfo.getPicture1().transferTo(dest);
+
+
+      pic1= "http://10.26.111.227:8888/comment/getphoto/"+commentid +"_picture1"+suffix;
     }
-    if (commentInfo.getPicture2()!=null&&commentInfo.getPicture2().length()>0){
-      String path=commentInfo.getPicture2();
-      int index=path.lastIndexOf(".");
-      String suffix=path.substring(index);
-      start(commentInfo.getPicture2(), commentid +"_picture2"+suffix);
-//      comment.setPicture2(id+"_picture2"+suffix);
-      pic2= commentid +"_picture2"+suffix;
-    }if (commentInfo.getPicture3()!=null&&commentInfo.getPicture3().length()>0){
-      String path=commentInfo.getPicture3();
-      int index=path.lastIndexOf(".");
-      String suffix=path.substring(index);
-      start(commentInfo.getPicture3(), commentid +"_picture3"+suffix);
-//      comment.setPicture3(id+"_picture3"+suffix);
-      pic3= commentid +"_picture3"+suffix;
-    }if (commentInfo.getVideo()!=null&&commentInfo.getVideo().length()>0){
-      String path=commentInfo.getVideo();
-      int index=path.lastIndexOf(".");
-      String suffix=path.substring(index);
-      start(commentInfo.getVideo(), commentid +"_video"+suffix);
-//      comment.setVideo(id+"_video"+suffix);
-      vid= commentid +"_video"+suffix;
+    if (commentInfo.getPicture2()!=null){
+      String fileName=commentInfo.getPicture2().getOriginalFilename();
+      int index=fileName.lastIndexOf(".");
+      String suffix=fileName.substring(index);
+      String path="D:\\OOADLab\\comment\\"+commentid +"_picture2"+suffix;
+      File dest = new File(path);
+
+      commentInfo.getPicture2().transferTo(dest);
+      pic2="http://10.26.111.227:8888/comment/getphoto/"+commentid +"_picture2"+suffix;
+
+    }if (commentInfo.getPicture3()!=null){
+      String fileName=commentInfo.getPicture3().getOriginalFilename();
+      int index=fileName.lastIndexOf(".");
+      String suffix=fileName.substring(index);
+      String path="D:\\OOADLab\\comment\\"+commentid +"_picture3"+suffix;
+      File dest = new File(path);
+
+      commentInfo.getPicture3().transferTo(dest);
+      pic3="http://10.26.111.227:8888/comment/getphoto/"+commentid +"_picture3"+suffix;
+
+    }if (commentInfo.getVideo()!=null){
+      String fileName=commentInfo.getVideo().getOriginalFilename();
+      int index=fileName.lastIndexOf(".");
+      String suffix=fileName.substring(index);
+      String path="D:\\OOADLab\\comment\\"+commentid +"_video"+suffix;
+      File dest = new File(path);
+
+      commentInfo.getVideo().transferTo(dest);
+      vid="http://10.26.111.227:8888/comment/getvideo/"+commentid +"_video"+suffix;
+
     }
     Comment comment=new Comment(commentid,score,commenttime,word,pic1,pic2,pic3,vid);
     commentRepository.save(comment);
 //    Comment result = commentRepository.save(comment);
     return "insert ok";
+
   }
+
+  @PostMapping(value = "/test")
+  @ResponseBody
+  public String test(UserFileReq req) {
+
+    return "insert ok";
+  }
+
 
 
   public void start(String path,String fileName) throws IOException {
@@ -249,11 +274,21 @@ public class CommentHandler {
   class CommentInfo{
     private Integer orderid;
     private Integer score;
-    private String word;
-    private String picture1;
-    private String picture2;
-    private String picture3;
-    private String video;
+    private String words;
+    private MultipartFile picture1;
+    private MultipartFile picture2;
+    private MultipartFile picture3;
+    private MultipartFile video;
+  }
+
+  @Data
+  static
+  class UserFileReq {
+    // 参数
+    private String username;
+    // 文件
+    private MultipartFile file;
+    // 省略get\set
   }
 
 

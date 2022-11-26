@@ -1,8 +1,10 @@
 package com.example.demo.controller;
 
 
+import com.example.demo.entity.Customer;
 import com.example.demo.entity.Gift;
 import com.example.demo.entity.GiftOrder;
+import com.example.demo.repository.CustomerRepository;
 import com.example.demo.repository.GiftOrderRepository;
 import com.example.demo.repository.GiftRepository;
 import lombok.Data;
@@ -22,6 +24,8 @@ public class GiftOrderHandler {
     GiftOrderRepository giftOrderRepository;
     @Autowired
     GiftRepository giftRepository;
+    @Autowired
+    CustomerRepository customerRepository;
 
     @Autowired
     JdbcTemplate jdbcTemplate;
@@ -61,11 +65,26 @@ public class GiftOrderHandler {
 
 
     @PostMapping("/creategiftorder")
-    public String   insert(@RequestBody GiftOrderInfo giftOrderInfo){
+    public Boolean   insert(@RequestBody GiftOrderInfo giftOrderInfo){
 
         String giftName=giftOrderInfo.getGiftname();
         Integer customerid=giftOrderInfo.getUserID();
         Integer amount=giftOrderInfo.getAmount();
+
+        Customer customer=customerRepository.findByCustomerid(customerid);
+        Gift gift=giftRepository.findGiftByGiftname(giftName);
+        if (customer==null||gift==null){
+            return false;
+        }
+        Integer credit=customer.getCredits();
+
+
+        if (credit-amount*gift.getCredits()<0){
+            return false;
+        }
+
+
+
         Date now=new Date();
         SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -80,7 +99,7 @@ public class GiftOrderHandler {
 
         giftOrderRepository.save(giftOrder);
 
-        return "insert ok";
+        return true;
     }
 
 
