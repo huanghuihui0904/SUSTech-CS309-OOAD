@@ -420,10 +420,10 @@ public class OrdersHandler {
         System.out.println(difference);
         int currentPaid=difference*roomType.getPrice();
         if (currentPaid>customer.getMoney()+currentBack){
-            returnInfo.setMoneyChange(currentPaid-currentBack);
+            returnInfo.setMoneyChange(-currentPaid+currentBack);
             returnInfo.setModifySucceeded(false);
         }else {
-            returnInfo.setMoneyChange(currentPaid-currentBack);
+            returnInfo.setMoneyChange(-currentPaid+currentBack);
             returnInfo.setModifySucceeded(true);
 
 
