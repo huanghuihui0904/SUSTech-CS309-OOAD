@@ -15,6 +15,7 @@ public class Manager {
   Integer hotelid;
   String loginpassword;
   String identity;
+  String managername;
 
 
 }
