@@ -319,18 +319,19 @@ public class OrdersHandler {
 
 
     @PostMapping("/booking")
-    public boolean booking(bookInfo bookInfo){
+    public boolean booking(@RequestBody bookInfo bookInfo){
         Integer maxId=jdbcTemplate.queryForObject("select MAX(orderid) from orders", Integer.class);
         if (maxId==null)maxId=0;
 
         String roomType= bookInfo.getRoomType();
         String hotelName=bookInfo.getHotelName();
-        String userName=bookInfo.getHotelName();
+        String userName=bookInfo.getUsername();
         Integer cost=bookInfo.getCost();
+//        return  userName +hotelName+ cost;
 
-        Customer customer=customerRepository.findCustomerByName(userName);
-        Integer customerid=customer.getCustomerid();
+        Customer customer=customerRepository.findByName(userName);
         Hotel hotel=hotelRepository.findHotelByHotelname(hotelName);
+        Integer customerid=customer.getCustomerid();
         Integer hotelid=hotel.getHotelid();
         List<RoomType> roomTypeList=roomTypeRepository.findRoomTypesByHotelid(hotelid);
         if (roomTypeList == null){
@@ -419,10 +420,10 @@ public class OrdersHandler {
         System.out.println(difference);
         int currentPaid=difference*roomType.getPrice();
         if (currentPaid>customer.getMoney()+currentBack){
-            returnInfo.setMoneyChange(customer.getMoney()-currentPaid+currentBack);
+            returnInfo.setMoneyChange(currentPaid);
             returnInfo.setModifySucceeded(false);
         }else {
-            returnInfo.setMoneyChange(customer.getMoney()-currentPaid+currentBack);
+            returnInfo.setMoneyChange(currentPaid);
             returnInfo.setModifySucceeded(true);
 
 
@@ -588,13 +589,15 @@ public class OrdersHandler {
 
 
     @Data
+    static
     class bookInfo{
         String startDate;
         String endDate;
         String roomType;
         String hotelName;
-        String guestsNumber;
         Integer cost;
+        String username;
+
     }
 
 

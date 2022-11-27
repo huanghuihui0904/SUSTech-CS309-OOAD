@@ -67,19 +67,25 @@ public class GiftOrderHandler {
     @PostMapping("/creategiftorder")
     public Boolean   insert(@RequestBody GiftOrderInfo giftOrderInfo){
 
-        String giftName=giftOrderInfo.getGiftname();
+        String giftName=giftOrderInfo.getGiftName();
         Integer customerid=giftOrderInfo.getUserID();
         Integer amount=giftOrderInfo.getAmount();
 
         Customer customer=customerRepository.findByCustomerid(customerid);
         Gift gift=giftRepository.findGiftByGiftname(giftName);
         if (customer==null||gift==null){
+            System.out.println(customer);
+            System.out.println(gift);
+            System.out.println(giftName);
+            gift=giftRepository.findGiftByGiftname("葡萄酒");
+            System.out.println(gift);
             return false;
         }
         Integer credit=customer.getCredits();
 
 
         if (credit-amount*gift.getCredits()<0){
+            System.out.println(credit-amount*gift.getCredits());
             return false;
         }
 
@@ -97,7 +103,7 @@ public class GiftOrderHandler {
         String sql="update customer set credits=? where customerid=?";
         jdbcTemplate.update(sql,credit-amount*gift.getCredits(),customerid);
 
-        GiftOrder giftOrder=new GiftOrder(customerid,giftName,amount,ordertime,giftOrderInfo.getAddress(),giftOrderInfo.getUsername());
+        GiftOrder giftOrder=new GiftOrder(customerid,giftName,amount,ordertime,giftOrderInfo.getAddress(),giftOrderInfo.getUserName());
         giftOrder.setGiftorderid(maxId+1);
 
 
@@ -109,13 +115,15 @@ public class GiftOrderHandler {
 
 
     @Data
+    static
     class GiftOrderInfo{
         private Integer userID;
-        private String giftname;
-        private String username;
+        private String giftName;
+        private String userName;
         private String telephone;
         private Integer amount;
         private String address;
+
 
     }
 
