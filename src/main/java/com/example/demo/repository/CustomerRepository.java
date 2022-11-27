@@ -1,10 +1,7 @@
 package com.example.demo.repository;
 
-import com.example.demo.entity.Comment;
 import com.example.demo.entity.Customer;
-import org.apache.ibatis.annotations.Select;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
@@ -17,5 +14,8 @@ public interface CustomerRepository extends JpaRepository<Customer,Integer> {
 
     public List<Customer> findCustomersByCustomerid(Integer id);
     public List<Customer> findCustomersByTelephone(String telephone);
+
+
+    public Customer findCustomerByName(String name);
     public List<Customer> findAll();
 }

@@ -13,6 +13,8 @@ public interface HotelRepository extends JpaRepository<Hotel,Integer> {
 
   public List<Hotel> findHotelsByCityname(String city);
 
+  public  Hotel findHotelByHotelname(String name);
+
   //    @Query(value = "select * from orders",nativeQuery = true)
   public List<Hotel> findAll();
 

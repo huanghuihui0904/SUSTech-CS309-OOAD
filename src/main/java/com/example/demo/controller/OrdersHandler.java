@@ -2,10 +2,7 @@ package com.example.demo.controller;
 
 
 import com.example.demo.entity.*;
-import com.example.demo.repository.CustomerRepository;
-import com.example.demo.repository.HotelRepository;
-import com.example.demo.repository.OrdersRepository;
-import com.example.demo.repository.RoomTypeRepository;
+import com.example.demo.repository.*;
 import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +26,8 @@ public class OrdersHandler {
     HotelRepository hotelRepository;
     @Autowired
     CustomerRepository customerRepository;
+    @Autowired
+    RoomRepository roomRepository;
 
 
     @Autowired
@@ -152,7 +151,7 @@ public class OrdersHandler {
 
 
         if ((customerName==null||customerName.equals("") )&&(hotelName==null||hotelName.equals("") )&&
-            (telephone==null||telephone.equals("") )&& (cityName==null||cityName.equals("") )){
+                (telephone==null||telephone.equals("") )&& (cityName==null||cityName.equals("") )){
             return null;
         }
         List<OrdersInfoA> ordersInfoAS=findAllA();
@@ -320,31 +319,86 @@ public class OrdersHandler {
 
 
     @PostMapping("/booking")
-    public String booking(@RequestParam String startDate,@RequestParam String endDate,@RequestParam String roomType,
-                          @RequestParam String hotelName,@RequestParam String guestsNumber,@RequestParam Integer cost){
+    public boolean booking(bookInfo bookInfo){
         Integer maxId=jdbcTemplate.queryForObject("select MAX(orderid) from orders", Integer.class);
         if (maxId==null)maxId=0;
+
+        String roomType= bookInfo.getRoomType();
+        String hotelName=bookInfo.getHotelName();
+        String userName=bookInfo.getHotelName();
+        Integer cost=bookInfo.getCost();
+
+        Customer customer=customerRepository.findCustomerByName(userName);
+        Integer customerid=customer.getCustomerid();
+        Hotel hotel=hotelRepository.findHotelByHotelname(hotelName);
+        Integer hotelid=hotel.getHotelid();
+        List<RoomType> roomTypeList=roomTypeRepository.findRoomTypesByHotelid(hotelid);
+        if (roomTypeList == null){
+            return false;
+        }
+        RoomType type = null;
+        for (RoomType r: roomTypeList) {
+            if (Objects.equals(r.getRoomname(), roomType)){
+                type=r;
+                break;
+            }
+        }
+        if ( type==null){
+            return false;
+        }
+        Integer roomtypeid=type.getRoomtypeid();
+        List<Room> roomList=roomRepository.findRoomsByRoomtypeid(roomtypeid);
+        Room room=null;
+        for (Room r: roomList) {
+            if (r.getIsordered()==0){
+                room=r;
+                break;
+            }
+        }
+        if (room==null){
+            return  false;
+        }
+        Integer roomid=room.getRoomid();
+
+
+
+
+        if (customer.getMoney()<cost){
+            return false;
+        }
+        String sql1 = "update customer set money=? where customerid=?";
+        jdbcTemplate.update(sql1,customer.getMoney()-cost,customerid);
+        String sql2 = "update customer set credits=? where customerid=?";
+        jdbcTemplate.update(sql2,customer.getCredits()+cost,customerid);
 
 
         Orders orders=new Orders();
         orders.setOrderid(maxId+1);
+        orders.setCustomerid(customerid);
+        orders.setHotelid(hotelid);
+        orders.setRoomtypeid(roomtypeid);
+        orders.setRoomid(roomid);
+        Date now=new Date();
+        SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String ordertime=format.format(now);
+        orders.setOrdertime(ordertime);
+        orders.setCheckintime(bookInfo.getStartDate());
+        orders.setCheckouttime(bookInfo.getEndDate());
+        orders.setAmountpaid(cost);
 
+        ordersRepository.save(orders);
 
-        orders.setOrderid(maxId+1);
-
-//        Orders result = ordersRepository.save(orders);
-//        if(result!=null){
-//            return "insert ok";
-//        }else {
-//            return "insert fail";
-//        }
-        return "ca";
+        return true;
     }
 
 
-    @PutMapping("/modifyOrderTime/{id}")
-    public boolean modifyOrderTime(@PathVariable("id") int id,@RequestParam("checkintime")String checkintime,@RequestParam("checkouttime")String checkouttime) throws ParseException {
+    @PutMapping("/modifyordertime")
+    public ReturnInfo modifyOrderTime(@RequestBody ModifyInfo modifyInfo) throws ParseException {
+        Integer id=modifyInfo.getOrderID();
 
+        String checkintime= modifyInfo.getCheckinTime();
+        String checkouttime= modifyInfo.getCheckoutTime();
+        ReturnInfo returnInfo=new ReturnInfo();
         Orders orders=ordersRepository.findOrderByOrderid(id);
         Integer customerId=orders.getCustomerid();
         Integer roomtypeId=orders.getRoomtypeid();
@@ -352,26 +406,40 @@ public class OrdersHandler {
         Customer customer=customerRepository.findByCustomerid(customerId);
 
         SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String ckin=orders.getCheckintime();
+        String ckout=orders.getCheckouttime();
+        Date ckind=format.parse(ckin);
+        Date ckoutd=format.parse(ckout);
+        int dif= (int) ((ckoutd.getTime()-ckind.getTime())/(1000*60*60*24));
+        int currentBack=dif*roomType.getPrice();
+
         Date checkout=format.parse(checkouttime);
         Date checkin=format.parse(checkintime);
         int difference= (int) ((checkout.getTime()-checkin.getTime())/(1000*60*60*24));
+        System.out.println(difference);
         int currentPaid=difference*roomType.getPrice();
-        if (currentPaid<customer.getMoney()){
-            return  false;
+        if (currentPaid>customer.getMoney()+currentBack){
+            returnInfo.setMoneyChange(customer.getMoney()-currentPaid+currentBack);
+            returnInfo.setModifySucceeded(false);
+        }else {
+            returnInfo.setMoneyChange(customer.getMoney()-currentPaid+currentBack);
+            returnInfo.setModifySucceeded(true);
+
+
+            String sql = "update orders set checkintime=? , checkouttime=? where orderid=?";
+
+            jdbcTemplate.update(sql, checkintime, checkouttime, id);
+
+            String sql2 = "update customer set money=? where customerid=?";
+
+            jdbcTemplate.update(sql2,customer.getMoney()-currentPaid+currentBack,customerId);
+
+            String sql3 = "update customer set credits=? where customerid=?";
+
+            jdbcTemplate.update(sql3,customer.getCredits()+currentPaid-currentBack,customerId);
         }
-        if (roomType.getRemain()<0){
-            return  false;
-        }
 
-//        int currentAmount=
-
-
-
-        String sql = "update orders set checkintime=? , checkouttime=? where orderid=?";
-        jdbcTemplate.update(sql,checkintime,checkouttime,id);
-        // 查询
-//        return ordersRepository.findOrderByOrderid(id);
-        return true;
+        return  returnInfo;
     }
 
     //todo test 高并发
@@ -380,7 +448,7 @@ public class OrdersHandler {
         String sql = "update roomtype set remain=remain-1 where roomtypeid=9";
         int result=jdbcTemplate.update(sql);
 
-return result;
+        return result;
 
     }
 
@@ -502,6 +570,32 @@ return result;
 
     }
 
+
+    @Data
+    static
+    class ReturnInfo{
+        boolean modifySucceeded;
+        Integer moneyChange;
+    }
+
+    @Data
+    static
+    class ModifyInfo{
+        Integer orderID;
+        String checkinTime;
+        String checkoutTime;
+    }
+
+
+    @Data
+    class bookInfo{
+        String startDate;
+        String endDate;
+        String roomType;
+        String hotelName;
+        String guestsNumber;
+        Integer cost;
+    }
 
 
 

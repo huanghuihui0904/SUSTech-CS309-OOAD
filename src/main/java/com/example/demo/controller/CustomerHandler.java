@@ -1,6 +1,9 @@
 package com.example.demo.controller;
 
-import com.example.demo.entity.*;
+import com.example.demo.entity.Customer;
+import com.example.demo.entity.HotelWishList;
+import com.example.demo.entity.Orders;
+import com.example.demo.entity.RoomTypeWishList;
 import com.example.demo.repository.*;
 import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;

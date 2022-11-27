@@ -61,7 +61,7 @@ public class RoomTypeHandler {
     List<Hotel> hotels = hotelRepository.findHotelsByHotelname(hotelName);
     int hotelId = hotels.get(0).getHotelid();
     System.out.println(hotelId);
-    List<RoomType> roomTypes = roomTypeRepository.findRoomTypeByHotelid(hotelId);
+    List<RoomType> roomTypes = roomTypeRepository.findRoomTypesByHotelid(hotelId);
 
     return roomTypes;
   }

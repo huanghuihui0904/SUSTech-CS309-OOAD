@@ -93,6 +93,10 @@ public class GiftOrderHandler {
         Integer maxId = jdbcTemplate.queryForObject("select MAX(giftorderid) from giftorder", Integer.class);
         if (maxId==null)maxId=0;
 
+
+        String sql="update customer set credits=? where customerid=?";
+        jdbcTemplate.update(sql,credit-amount*gift.getCredits(),customerid);
+
         GiftOrder giftOrder=new GiftOrder(customerid,giftName,amount,ordertime,giftOrderInfo.getAddress(),giftOrderInfo.getUsername());
         giftOrder.setGiftorderid(maxId+1);
 
@@ -105,7 +109,7 @@ public class GiftOrderHandler {
 
 
     @Data
-    static class GiftOrderInfo{
+    class GiftOrderInfo{
         private Integer userID;
         private String giftname;
         private String username;

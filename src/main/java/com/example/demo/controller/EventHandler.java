@@ -2,11 +2,7 @@ package com.example.demo.controller;
 
 
 import com.example.demo.entity.Event;
-import com.example.demo.entity.Hotel;
-import com.example.demo.entity.Room;
 import com.example.demo.repository.EventRepository;
-import com.example.demo.repository.HotelRepository;
-import com.example.demo.repository.RoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
