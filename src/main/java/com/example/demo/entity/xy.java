@@ -19,4 +19,8 @@ public class xy {
     this.time=time;
     this.y=i;
   }
+
+  public xy() {
+
+  }
 }

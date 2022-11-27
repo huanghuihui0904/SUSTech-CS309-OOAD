@@ -2,6 +2,7 @@ package com.example.demo.secondKill;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 //下订单
 @Service
 @Slf4j
+@RabbitListener(queues = MyRabbitMQConfig.ORDER_QUEUE)
 public class MQOrderService {
   @Autowired
   private OrderService orderService;
@@ -23,10 +25,12 @@ public class MQOrderService {
 //   *
 //   * @param id
 //   */
-  @RabbitListener(queues = MyRabbitMQConfig.ORDER_QUEUE)
-  public void createOrder(String username,String goodsname) {
-    log.info("收到订单消息");
-    orderService.createOrder(username,goodsname);
+@RabbitHandler
+
+  public void createOrder(seckillOrderInfo info) {
+    System.out.println("收到订单消息");
+//    log.info("收到订单消息");
+    orderService.createOrder(info.getUsername(),info.getGoodsname());
   }
 }
 

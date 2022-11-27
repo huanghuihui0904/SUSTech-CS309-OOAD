@@ -2,6 +2,7 @@ package com.example.demo.secondKill;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,20 +16,22 @@ import org.springframework.stereotype.Service;
 //减库存
 @Slf4j
 @Service
-public class MQService {
+@RabbitListener(queues = MyRabbitMQConfig.STORY_QUEUE)
+public class MQStoryService {
   @Autowired
   private OrderService Service;
 //  /**
 //   * 监听库存消息队列，并消费
 //   * @param id
 //   */
-  @RabbitListener(queues = MyRabbitMQConfig.STORY_QUEUE)
-  public void decrByOrder(Integer roomtypeid) {
+@RabbitHandler
+  public void decrByOrder(seckillOrderInfo info) {
     /**
      * 调用数据库service给数据库对应商品库存减一
      */
-    log.info("减库存");
-    Service.decrByOrder(roomtypeid);
+    System.out.println("减库存");
+//    log.info("减库存");
+    Service.decrByOrder(info.getGoodsname());
   }
 }
 
