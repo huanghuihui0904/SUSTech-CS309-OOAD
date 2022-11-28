@@ -94,8 +94,20 @@ public class HotelWishListHandler {
     System.out.println(hotelID);
     System.out.println(userID);
     HotelWishList h=new HotelWishList(hotelID,userID);
-    hotelWishListRepository.delete(h);
-    return "delete ok";
+    int id=0;
+    List<HotelWishList>all=hotelWishListRepository.findAll();
+    for (int i = 0; i < all.size(); i++) {
+      if(all.get(i).getHotelid()==hotelID&&all.get(i).getCustomerid()==userID){
+        id=all.get(i).getHotelwishlistid();
+      }
+    }
+    if(id!=0){
+      hotelWishListRepository.deleteById(id);
+      return "delete ok";
+    }else {
+      return "delete fail";
+    }
+
 
 
   }
