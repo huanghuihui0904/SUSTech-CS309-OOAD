@@ -19,6 +19,7 @@ public class Hotel {
   String email;
   String explanation;
   String introduction;
-
+double longitude;
+double latitude;
 
 }
