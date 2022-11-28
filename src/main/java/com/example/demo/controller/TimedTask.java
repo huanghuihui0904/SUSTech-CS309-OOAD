@@ -50,6 +50,7 @@ public class TimedTask {
         if (maxId == null) {
             maxId = 0;
         }
+
         Date now = new Date();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Event event = new Event();
