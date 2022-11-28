@@ -54,7 +54,9 @@ public class RoomTypeWishListHandler {
     for (int i = 0; i <roomTypeWishLists.size() ; i++) {
       Hotel hotel=hotelRepository.findHotelByHotelid(roomTypeWishLists.get(i).getHotelid());
       RoomType roomType=roomTypeRepository.findRoomTypeByRoomtypeid(roomTypeWishLists.get(i).getRoomtypeid());
-
+if(roomType==null ||hotel==null){
+  continue;
+}
         wishlistInfo w=new wishlistInfo(roomType.getRoomtypeid(),hotel.getHotelname(),roomType.getRoomname());
         re.add(w);
 

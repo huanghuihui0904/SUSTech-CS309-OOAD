@@ -45,6 +45,9 @@ public class HotelWishListHandler {
     List<wishlistInfo> re=new ArrayList<>();
     for (int i = 0; i <hotelWishLists.size() ; i++) {
       Hotel hotel=hotelRepository.findHotelByHotelid(hotelWishLists.get(i).getHotelid());
+      if(hotel==null){
+        continue;
+      }
       wishlistInfo w=new wishlistInfo(hotel.getHotelid(),hotel.getHotelname(),hotel.getTelephone());
       re.add(w);
     }
