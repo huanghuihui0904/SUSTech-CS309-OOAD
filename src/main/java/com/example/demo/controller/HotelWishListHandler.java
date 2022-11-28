@@ -58,12 +58,12 @@ public class HotelWishListHandler {
     int hotelID = 0;
     for (int i = 0; i <js.size() ; i++) {
       if(js.get(i)[0].equals("userID")){
-        userID= Integer.parseInt(js.get(i)[1]);
+        userID= Integer.parseInt(js.get(i)[1].trim());
       }
     }
     for (int i = 0; i <js.size() ; i++) {
       if(js.get(i)[0].equals("hotelID")){
-        hotelID= Integer.parseInt(js.get(i)[1]);
+        hotelID= Integer.parseInt(js.get(i)[1].trim());
       }
     }
     System.out.println(hotelID);
@@ -83,19 +83,31 @@ public class HotelWishListHandler {
     int hotelID = 0;
     for (int i = 0; i <js.size() ; i++) {
       if(js.get(i)[0].equals("userID")){
-        userID= Integer.parseInt(js.get(i)[1]);
+        userID= Integer.parseInt(js.get(i)[1].trim());
       }
     }
     for (int i = 0; i <js.size() ; i++) {
       if(js.get(i)[0].equals("hotelID")){
-        hotelID= Integer.parseInt(js.get(i)[1]);
+        hotelID= Integer.parseInt(js.get(i)[1].trim());
       }
     }
     System.out.println(hotelID);
     System.out.println(userID);
     HotelWishList h=new HotelWishList(hotelID,userID);
-    hotelWishListRepository.delete(h);
-    return "delete ok";
+    int id=0;
+    List<HotelWishList>all=hotelWishListRepository.findAll();
+    for (int i = 0; i < all.size(); i++) {
+      if(all.get(i).getHotelid()==hotelID&&all.get(i).getCustomerid()==userID){
+        id=all.get(i).getHotelwishlistid();
+      }
+    }
+    if(id!=0){
+      hotelWishListRepository.deleteById(id);
+      return "delete ok";
+    }else {
+      return "delete fail";
+    }
+
 
 
   }

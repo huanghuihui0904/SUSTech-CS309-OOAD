@@ -1,7 +1,9 @@
 package com.example.demo.controller;
 
+import com.example.demo.entity.Event;
 import com.example.demo.entity.Hotel;
 import com.example.demo.entity.RoomType;
+import com.example.demo.repository.EventRepository;
 import com.example.demo.repository.HotelRepository;
 import com.example.demo.repository.RoomTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +14,12 @@ import com.example.demo.JsonUtil;
 
 import javax.transaction.Transactional;
 import java.io.UnsupportedEncodingException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 @RestController
 @RequestMapping(value = "/roomtype")
@@ -24,7 +30,8 @@ public class RoomTypeHandler {
   @Autowired
   HotelRepository hotelRepository;
 
-
+@Autowired
+  EventRepository eventRepository;
   @Autowired
   JdbcTemplate jdbcTemplate;
 
@@ -37,6 +44,7 @@ public class RoomTypeHandler {
   @GetMapping("/getAll")
   public List<RoomType> findAll() {
     List<RoomType> roomTypes = roomTypeRepository.findAll();
+
     return roomTypes;
   }
 
@@ -238,7 +246,24 @@ public class RoomTypeHandler {
     boolean breakfast;
 
   }
-
+  public Event findEvent() {
+    List<Event> events = eventRepository.findAll();
+    String cur = curTime();
+    Event re = new Event();
+    for (int i = 0; i < events.size(); i++) {
+      if (events.get(i).getBegintime().compareTo(cur) < 0 && cur.compareTo(events.get(i).getEndtime()) < 0) {
+        re = events.get(i);
+        return re;
+      }
+    }
+    return re;
+  }
+  public String curTime() {
+    DateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    sdf1.setTimeZone(TimeZone.getTimeZone("GMT+8"));
+    String date = sdf1.format(new Date());
+    return date;
+  }
 
 }
 
