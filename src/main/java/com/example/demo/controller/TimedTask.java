@@ -40,8 +40,8 @@ public class TimedTask {
 //    }
 
 
-  //每次12点开始 持续12个小时抢当天的
-  @Scheduled(cron = "0 0 12 ? * *")
+  //每次0点开始 持续24个小时抢当天的
+  @Scheduled(cron = "0 0 0 ? * *")
   public String startJob() {
     Integer maxId = jdbcTemplate.queryForObject("select MAX(eventid) from event", Integer.class);
     if (maxId==null){
@@ -70,7 +70,7 @@ public class TimedTask {
     event.setHotelid(roomType.getHotelid());
     event.setRoomtypeid(roomTypeid);
     event.setBegintime(format.format(now));
-    Date d=new Date(now.getTime()+12*60*60*1000-1);
+    Date d=new Date(now.getTime()+24*60*60*1000-1);
     event.setEndtime(format.format(d));
     event.setDiscountprice(0.9);
 
