@@ -58,12 +58,12 @@ public class HotelWishListHandler {
     int hotelID = 0;
     for (int i = 0; i <js.size() ; i++) {
       if(js.get(i)[0].equals("userID")){
-        userID= Integer.parseInt(js.get(i)[1]);
+        userID= Integer.parseInt(js.get(i)[1].trim());
       }
     }
     for (int i = 0; i <js.size() ; i++) {
       if(js.get(i)[0].equals("hotelID")){
-        hotelID= Integer.parseInt(js.get(i)[1]);
+        hotelID= Integer.parseInt(js.get(i)[1].trim());
       }
     }
     System.out.println(hotelID);
@@ -83,12 +83,12 @@ public class HotelWishListHandler {
     int hotelID = 0;
     for (int i = 0; i <js.size() ; i++) {
       if(js.get(i)[0].equals("userID")){
-        userID= Integer.parseInt(js.get(i)[1]);
+        userID= Integer.parseInt(js.get(i)[1].trim());
       }
     }
     for (int i = 0; i <js.size() ; i++) {
       if(js.get(i)[0].equals("hotelID")){
-        hotelID= Integer.parseInt(js.get(i)[1]);
+        hotelID= Integer.parseInt(js.get(i)[1].trim());
       }
     }
     System.out.println(hotelID);

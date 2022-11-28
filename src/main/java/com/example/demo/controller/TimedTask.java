@@ -7,7 +7,6 @@ import com.example.demo.entity.RoomType;
 import com.example.demo.repository.EventRepository;
 import com.example.demo.repository.RoomRepository;
 import com.example.demo.repository.RoomTypeRepository;
-import jdk.nashorn.internal.ir.WhileNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.EnableScheduling;

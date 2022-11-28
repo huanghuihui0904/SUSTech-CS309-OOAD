@@ -71,17 +71,17 @@ public class RoomTypeWishListHandler {
     int hotelID=0;
     for (int i = 0; i <js.size() ; i++) {
       if(js.get(i)[0].equals("hotelID")){
-        hotelID= Integer.parseInt(js.get(i)[1]);
+        hotelID= Integer.parseInt(js.get(i)[1].trim());
       }
     }
     for (int i = 0; i <js.size() ; i++) {
       if(js.get(i)[0].equals("userID")){
-        userID= Integer.parseInt(js.get(i)[1]);
+        userID= Integer.parseInt(js.get(i)[1].trim());
       }
     }
     for (int i = 0; i <js.size() ; i++) {
       if(js.get(i)[0].equals("roomTypeID")){
-        roomTypeID= Integer.parseInt(js.get(i)[1]);
+        roomTypeID= Integer.parseInt(js.get(i)[1].trim());
       }
     }
 
@@ -101,20 +101,20 @@ public class RoomTypeWishListHandler {
     int hotelID=0;
     for (int i = 0; i <js.size() ; i++) {
       if(js.get(i)[0].equals("hotelID")){
-        hotelID= Integer.parseInt(js.get(i)[1]);
+        hotelID= Integer.parseInt(js.get(i)[1].trim());
         System.out.println("hotel"+hotelID);
       }
     }
     for (int i = 0; i <js.size() ; i++) {
       if(js.get(i)[0].equals("userID")){
-        userID= Integer.parseInt(js.get(i)[1]);
+        userID= Integer.parseInt(js.get(i)[1].trim());
         System.out.println("userID"+userID);
 
       }
     }
     for (int i = 0; i <js.size() ; i++) {
       if(js.get(i)[0].equals("roomTypeID")){
-        roomTypeID= Integer.parseInt(js.get(i)[1]);
+        roomTypeID= Integer.parseInt(js.get(i)[1].trim());
         System.out.println("roomTypeID"+roomTypeID);
       }
     }
