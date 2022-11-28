@@ -18,7 +18,7 @@ public class Event {
   String begintime;
   String endtime;
 
-  Integer discountprice;
+  Double discountprice;
 
 
 }

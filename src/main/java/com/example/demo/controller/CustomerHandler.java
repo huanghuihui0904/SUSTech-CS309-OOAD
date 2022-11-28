@@ -140,7 +140,7 @@ public class CustomerHandler {
         customer.setCustomerid(maxId+1);
         List<Customer> customer1=customerRepository.findCustomersByName(customerInfo.getName());
         List<Customer> customer2=customerRepository.findCustomersByTelephone(customerInfo.getTelephone());
-        Collection<Customer>customers=CollectionUtils.intersection(customer1,customer2);
+        Collection<Customer>customers=CollectionUtils.union(customer1,customer2);
         if ( customers.size()==0){
             Customer result = customerRepository.save(customer);
             return true;
