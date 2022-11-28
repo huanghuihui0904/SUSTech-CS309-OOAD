@@ -52,9 +52,10 @@ public class CommentHandler {
 
 
 
-  @GetMapping( "/{id}")
-  public List<Comment> getbyid(@PathVariable("id") int id){
-    Hotel hotel=hotelRepository.findHotelByHotelid(id);
+  @GetMapping( "/{hotelname}")
+  public List<Comment> getbyid(@PathVariable("hotelname") String hotelname){
+    Hotel hotel=hotelRepository.findHotelByHotelname(hotelname);
+    Integer id=hotel.getHotelid();
     List<Orders> orders=ordersRepository.findOrdersByHotelid(id);
     List<Comment>commentList=new ArrayList<>();
     for (Orders o:
@@ -99,7 +100,7 @@ public class CommentHandler {
   public  void getPhoto(HttpServletResponse response,@PathVariable("picname") String picname) throws Exception {
 
 
-     File file=new File("D:\\OOADLab\\comment\\"+picname);
+    File file=new File("D:\\OOADLab\\comment\\"+picname);
 
 
     FileInputStream fis;
@@ -168,9 +169,11 @@ public class CommentHandler {
 
     if (commentInfo.getPicture1()!=null) {
       String fileName=commentInfo.getPicture1().getOriginalFilename();
-      int index=fileName.lastIndexOf(".");
-      String suffix=fileName.substring(index);
-      String path="D:\\OOADLab\\comment\\"+commentid +"_picture1"+suffix;
+//      int index=fileName.lastIndexOf(".");
+//      String suffix=fileName.substring(index);
+      String suffix=".png";
+
+      String path="D:\\OOADLab\\comment\\"+commentid +fileName+suffix;
       File dest = new File(path);
       //检测是否存在该目录
 //      if (!dest.getParentFile().exists()){
@@ -180,37 +183,40 @@ public class CommentHandler {
       commentInfo.getPicture1().transferTo(dest);
 
 
-      pic1= "http://10.26.111.227:8888/comment/getphoto/"+commentid +"_picture1"+suffix;
+      pic1= "http://10.26.111.227:8888/comment/getphoto/"+commentid +fileName+suffix;
     }
     if (commentInfo.getPicture2()!=null){
       String fileName=commentInfo.getPicture2().getOriginalFilename();
-      int index=fileName.lastIndexOf(".");
-      String suffix=fileName.substring(index);
-      String path="D:\\OOADLab\\comment\\"+commentid +"_picture2"+suffix;
+//      int index=fileName.lastIndexOf(".");
+//      String suffix=fileName.substring(index);
+      String suffix=".png";
+      String path="D:\\OOADLab\\comment\\"+commentid +fileName+suffix;
       File dest = new File(path);
 
       commentInfo.getPicture2().transferTo(dest);
-      pic2="http://10.26.111.227:8888/comment/getphoto/"+commentid +"_picture2"+suffix;
+      pic2="http://10.26.111.227:8888/comment/getphoto/"+commentid +fileName+suffix;
 
     }if (commentInfo.getPicture3()!=null){
       String fileName=commentInfo.getPicture3().getOriginalFilename();
-      int index=fileName.lastIndexOf(".");
-      String suffix=fileName.substring(index);
-      String path="D:\\OOADLab\\comment\\"+commentid +"_picture3"+suffix;
+//      int index=fileName.lastIndexOf(".");
+//      String suffix=fileName.substring(index);
+      String suffix=".png";
+      String path="D:\\OOADLab\\comment\\"+commentid +fileName+suffix;
       File dest = new File(path);
 
       commentInfo.getPicture3().transferTo(dest);
-      pic3="http://10.26.111.227:8888/comment/getphoto/"+commentid +"_picture3"+suffix;
+      pic3="http://10.26.111.227:8888/comment/getphoto/"+commentid +fileName+suffix;
 
     }if (commentInfo.getVideo()!=null){
       String fileName=commentInfo.getVideo().getOriginalFilename();
-      int index=fileName.lastIndexOf(".");
-      String suffix=fileName.substring(index);
-      String path="D:\\OOADLab\\comment\\"+commentid +"_video"+suffix;
+//      int index=fileName.lastIndexOf(".");
+//      String suffix=fileName.substring(index);
+      String suffix=".mp4";
+      String path="D:\\OOADLab\\comment\\"+commentid +fileName+suffix;
       File dest = new File(path);
 
       commentInfo.getVideo().transferTo(dest);
-      vid="http://10.26.111.227:8888/comment/getvideo/"+commentid +"_video"+suffix;
+      vid="http://10.26.111.227:8888/comment/getvideo/"+commentid +fileName+suffix;
 
     }
     Comment comment=new Comment(commentid,score,commenttime,word,pic1,pic2,pic3,vid);
