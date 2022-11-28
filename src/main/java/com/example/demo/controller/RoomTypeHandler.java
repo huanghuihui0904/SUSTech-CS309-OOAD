@@ -6,6 +6,7 @@ import com.example.demo.entity.RoomType;
 import com.example.demo.repository.EventRepository;
 import com.example.demo.repository.HotelRepository;
 import com.example.demo.repository.RoomTypeRepository;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.relational.core.sql.In;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import com.example.demo.JsonUtil;
 
 import javax.transaction.Transactional;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -30,22 +32,76 @@ public class RoomTypeHandler {
   @Autowired
   HotelRepository hotelRepository;
 
-@Autowired
+  @Autowired
   EventRepository eventRepository;
   @Autowired
   JdbcTemplate jdbcTemplate;
 
+  @Data
+  class reInfo implements Serializable {
+    Integer roomtypeid;
+    Integer hotelid;
+    String roomname;
+    Integer remain;
+    Integer price;
+    String introduction;
+    Integer number;
+    Double afterEventPrice;
+    Double discount;
+
+    public reInfo() {
+    }
+
+    public reInfo(RoomType r, Double afterEventPrice, Double discount) {
+      this.roomtypeid = r.getRoomtypeid();
+      this.hotelid = r.getHotelid();
+      this.roomname = r.getRoomname();
+      this.remain = r.getRemain();
+      this.price = r.getPrice();
+      this.introduction = r.getIntroduction();
+      this.number = r.getNumber();
+      this.afterEventPrice = afterEventPrice;
+      this.discount = discount;
+    }
+  }
+
   @GetMapping()
-  public RoomType getbyid(@RequestParam("id") int id) {
+  public reInfo getbyid(@RequestParam("id") int id) {
+    reInfo re = new reInfo();
     RoomType roomType = roomTypeRepository.findRoomTypeByRoomtypeid(id);
-    return roomType;
+
+    Event event = findEvent();
+    if (event != null&&event.getRoomtypeid()==roomType.getRoomtypeid()) {
+
+        re = new reInfo(roomType, roomType.getPrice() * event.getDiscountprice(), event.getDiscountprice());
+        return re;
+
+
+    } else {
+      re = new reInfo(roomType, 0.0, 1.0);
+      return re;
+    }
+
+
   }
 
   @GetMapping("/getAll")
-  public List<RoomType> findAll() {
+  public List<reInfo> findAll() {
     List<RoomType> roomTypes = roomTypeRepository.findAll();
+    List<reInfo> re =new ArrayList<>();
 
-    return roomTypes;
+    Event event = findEvent();
+    for (int i = 0; i < roomTypes.size(); i++) {
+      if (event != null&&event.getRoomtypeid()==roomTypes.get(i).getRoomtypeid()) {
+        reInfo t = new reInfo(roomTypes.get(i), roomTypes.get(i).getPrice() * event.getDiscountprice(), event.getDiscountprice());
+       re.add(t);
+      } else {
+        reInfo t = new reInfo(roomTypes.get(i), 0.0, 1.0);
+        re.add(t);
+      }
+    }
+
+    return re;
   }
 
 
@@ -63,15 +119,27 @@ public class RoomTypeHandler {
 
 
   @GetMapping("/hotel")
-  public List<RoomType> byHotel(@RequestParam("hotelName") String hotelName) throws UnsupportedEncodingException {
+  public List<reInfo> byHotel(@RequestParam("hotelName") String hotelName) throws UnsupportedEncodingException {
     System.out.println(hotelName);
 
     List<Hotel> hotels = hotelRepository.findHotelsByHotelname(hotelName);
     int hotelId = hotels.get(0).getHotelid();
     System.out.println(hotelId);
     List<RoomType> roomTypes = roomTypeRepository.findRoomTypesByHotelid(hotelId);
+    List<reInfo> re =new ArrayList<>();
 
-    return roomTypes;
+    Event event = findEvent();
+    for (int i = 0; i < roomTypes.size(); i++) {
+      if (event != null&&event.getRoomtypeid()==roomTypes.get(i).getRoomtypeid()) {
+        reInfo t = new reInfo(roomTypes.get(i), roomTypes.get(i).getPrice() * event.getDiscountprice(), event.getDiscountprice());
+        re.add(t);
+      } else {
+        reInfo t = new reInfo(roomTypes.get(i), 0.0, 1.0);
+        re.add(t);
+      }
+    }
+
+    return re;
   }
 
 
@@ -193,7 +261,7 @@ public class RoomTypeHandler {
 
 
   @GetMapping("/findByParameter")
-  public List<RoomType> byParameter(@RequestParam("roomName") String roomName, @RequestParam("minPrice") Integer minPrice, @RequestParam("maxPrice") Integer maxPrice, @RequestParam("guestNum") Integer guestNum, @RequestParam("introduction") String introduction) throws UnsupportedEncodingException {
+  public List<reInfo> byParameter(@RequestParam("roomName") String roomName, @RequestParam("minPrice") Integer minPrice, @RequestParam("maxPrice") Integer maxPrice, @RequestParam("guestNum") Integer guestNum, @RequestParam("introduction") String introduction) throws UnsupportedEncodingException {
     List<RoomType> all = roomTypeRepository.findAll();
     List<RoomType> remove = new ArrayList<>();
     System.out.println(roomName);
@@ -202,7 +270,7 @@ public class RoomTypeHandler {
     System.out.println(guestNum);
     System.out.println(introduction);
     for (int i = 0; i < all.size(); i++) {
-      if (!roomName .equals("")) {
+      if (!roomName.equals("")) {
         if (!all.get(i).getRoomname().equals(roomName)) {
           remove.add(all.get(i));
           continue;
@@ -236,8 +304,20 @@ public class RoomTypeHandler {
     for (int i = 0; i < remove.size(); i++) {
       all.remove(remove.get(i));
     }
+    List<reInfo> re =new ArrayList<>();
 
-    return all;
+    Event event = findEvent();
+    for (int i = 0; i < all.size(); i++) {
+      if (event != null&&event.getRoomtypeid()==all.get(i).getRoomtypeid()) {
+        reInfo t = new reInfo(all.get(i), all.get(i).getPrice() * event.getDiscountprice(), event.getDiscountprice());
+        re.add(t);
+      } else {
+        reInfo t = new reInfo(all.get(i), 0.0, 1.0);
+        re.add(t);
+      }
+    }
+
+    return re;
   }
 
   class roomTypeInfo {
@@ -246,6 +326,7 @@ public class RoomTypeHandler {
     boolean breakfast;
 
   }
+
   public Event findEvent() {
     List<Event> events = eventRepository.findAll();
     String cur = curTime();
@@ -258,6 +339,7 @@ public class RoomTypeHandler {
     }
     return re;
   }
+
   public String curTime() {
     DateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     sdf1.setTimeZone(TimeZone.getTimeZone("GMT+8"));
