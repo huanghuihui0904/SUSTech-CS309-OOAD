@@ -53,18 +53,19 @@ public class CommentHandler {
 
 
   @GetMapping( "/{hotelname}")
-  public List<Comment> getbyid(@PathVariable("hotelname") String hotelname){
+  public List<CommentInfoAll> getbyid(@PathVariable("hotelname") String hotelname){
     Hotel hotel=hotelRepository.findHotelByHotelname(hotelname);
     Integer id=hotel.getHotelid();
     List<Orders> orders=ordersRepository.findOrdersByHotelid(id);
-    List<Comment>commentList=new ArrayList<>();
+    List<CommentInfoAll>commentList=new ArrayList<>();
     for (Orders o:
             orders) {
       Integer commentid=o.getCommentid();
       if (commentid!=null){
         Comment comment=commentRepository.findAllByCommentid(commentid);
         if (comment!=null && !commentList.contains(comment)){
-          commentList.add(comment);
+          CommentInfoAll commentInfoAll=new CommentInfoAll(comment);
+          commentList.add(commentInfoAll);
         }
 
       }
@@ -291,6 +292,36 @@ public class CommentHandler {
     // 文件
     private MultipartFile file;
     // 省略get\set
+  }
+
+
+  @Data
+  class CommentInfoAll{
+    Integer commentid;
+    Integer score;
+    String commenttime;
+    String roomtypename;
+    String words;
+    String picture1;
+    String picture2;
+    String picture3;
+    String video;
+    public  CommentInfoAll(Comment comment){
+      this.commentid=comment.getCommentid();
+      this.score=comment.getScore();
+      this.commenttime=comment.getCommenttime();
+      this.words=comment.getWords();
+      this.picture1=comment.getPicture1();
+      this.picture2=comment.getPicture2();
+      this.picture3=comment.getPicture3();
+      this.video=comment.getVideo();
+      Orders orders=ordersRepository.findOrdersByCommentid(commentid);
+      Integer hotelid=orders.getHotelid();
+      Hotel hotel=hotelRepository.findHotelByHotelid(hotelid);
+      this.roomtypename=hotel.getHotelname();
+    }
+
+
   }
 
 

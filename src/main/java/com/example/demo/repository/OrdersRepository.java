@@ -17,6 +17,8 @@ public interface OrdersRepository extends JpaRepository<Orders,Integer> {
 
     public List<Orders> findOrdersByCustomeridAndHotelid(Integer customerid,Integer hotelid);
 
+    public Orders findOrdersByCommentid(Integer commentid);
+
 //    public List<Orders> findOrdersByCustomerid(Integer id);
 
 
