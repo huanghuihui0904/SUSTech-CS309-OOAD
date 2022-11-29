@@ -142,76 +142,71 @@ public class OrdersHandler {
 
 
     @RequestMapping(value = "/findbyparameters",method = RequestMethod.GET)
-    public List<OrdersInfoA> findbyparameters(@RequestParam(required = false,value = "customer") String customerName, @RequestParam(required = false,value = "hotel") String hotelName,
+    public List<OrdersInfoJ> findbyparameters(@RequestParam(required = false,value = "customer") String customerName, @RequestParam(required = false,value = "hotel") String hotelName,
                                               @RequestParam(required = false,value = "city") String cityName, @RequestParam(required = false,value = "telephone") String telephone){
-
-
-
-
-
 
         if ((customerName==null||customerName.equals("") )&&(hotelName==null||hotelName.equals("") )&&
                 (telephone==null||telephone.equals("") )&& (cityName==null||cityName.equals("") )){
             return null;
         }
-        List<OrdersInfoA> ordersInfoAS=findAllA();
+        List<OrdersInfoJ> ordersInfoAS=findAll();
 
         if (customerName!=null && !customerName.equals("")) {
-            List<OrdersInfoA> ordersInfoAS1=new ArrayList<>();
+            List<OrdersInfoJ> ordersInfoAS1=new ArrayList<>();
             List<Customer> customerList = customerRepository.findCustomersByName(customerName);
             for (Customer c : customerList) {
                 Integer customerID = c.getCustomerid();
                 List<Orders> orders=ordersRepository.findOrdersByCustomerid(customerID);
                 for (Orders o:orders){
-                    OrdersInfoA ordersInfoA=new OrdersInfoA(o);
+                    OrdersInfoJ ordersInfoA=new OrdersInfoJ(o);
                     ordersInfoAS1.add(ordersInfoA);
                 }
 
             }
-            ordersInfoAS= (List<OrdersInfoA>) CollectionUtils.intersection(ordersInfoAS,ordersInfoAS1);
+            ordersInfoAS= (List<OrdersInfoJ>) CollectionUtils.intersection(ordersInfoAS,ordersInfoAS1);
 
         }
 
         if (hotelName!=null && !hotelName.equals("")){
-            List<OrdersInfoA> ordersInfoAS2=new ArrayList<>();
+            List<OrdersInfoJ> ordersInfoAS2=new ArrayList<>();
             List<Hotel> hotelListName=hotelRepository.findHotelsByHotelname(hotelName);
             for (Hotel h:hotelListName){
                 Integer hotelID=h.getHotelid();
                 List<Orders> orders=ordersRepository.findOrdersByHotelid(hotelID);
                 for (Orders o:orders){
-                    OrdersInfoA ordersInfoA=new OrdersInfoA(o);
+                    OrdersInfoJ ordersInfoA=new OrdersInfoJ(o);
                     ordersInfoAS2.add(ordersInfoA);
                 }
             }
-            ordersInfoAS= (List<OrdersInfoA>) CollectionUtils.intersection(ordersInfoAS,ordersInfoAS2);
+            ordersInfoAS= (List<OrdersInfoJ>) CollectionUtils.intersection(ordersInfoAS,ordersInfoAS2);
 
         }
 
         if (telephone!=null && !telephone.equals("")){
-            List<OrdersInfoA> ordersInfoAS3=new ArrayList<>();
+            List<OrdersInfoJ> ordersInfoAS3=new ArrayList<>();
             Customer customerTelephone=customerRepository.findCustomerByTelephone(telephone);
             Integer customerID=customerTelephone.getCustomerid();
             List<Orders> orders=ordersRepository.findOrdersByCustomerid(customerID);
 
             for (Orders o:orders){
-                OrdersInfoA ordersInfoA=new OrdersInfoA(o);
+                OrdersInfoJ ordersInfoA=new OrdersInfoJ(o);
                 ordersInfoAS3.add(ordersInfoA);
             }
-            ordersInfoAS= (List<OrdersInfoA>) CollectionUtils.intersection(ordersInfoAS,ordersInfoAS3);
+            ordersInfoAS= (List<OrdersInfoJ>) CollectionUtils.intersection(ordersInfoAS,ordersInfoAS3);
         }
 
         if ( cityName!=null && !cityName.equals("")){
-            List<OrdersInfoA> ordersInfoAS4=new ArrayList<>();
+            List<OrdersInfoJ> ordersInfoAS4=new ArrayList<>();
             List<Hotel> hotelListCity=hotelRepository.findHotelsByCityname(cityName);
             for (Hotel h:hotelListCity){
                 Integer hotelID=h.getHotelid();
                 List<Orders> orders=ordersRepository.findOrdersByHotelid(hotelID);
                 for (Orders o:orders){
-                    OrdersInfoA ordersInfoA=new OrdersInfoA(o);
+                    OrdersInfoJ ordersInfoA=new OrdersInfoJ(o);
                     ordersInfoAS4.add(ordersInfoA);
                 }
             }
-            ordersInfoAS= (List<OrdersInfoA>) CollectionUtils.intersection(ordersInfoAS,ordersInfoAS4);
+            ordersInfoAS= (List<OrdersInfoJ>) CollectionUtils.intersection(ordersInfoAS,ordersInfoAS4);
 
         }
 
@@ -230,11 +225,11 @@ public class OrdersHandler {
 
 
     @RequestMapping(value = "/findAllA",method = RequestMethod.GET)
-    public List<OrdersInfoA> findAllA(){
+    public List<OrdersInfoJ> findAllA(){
         List<Orders> orders= ordersRepository.findAll();
-        List<OrdersInfoA> ordersInfoAList=new ArrayList<>();
+        List<OrdersInfoJ> ordersInfoAList=new ArrayList<>();
         for (Orders order:orders){
-            OrdersInfoA ordersInfoa=new OrdersInfoA(order);
+            OrdersInfoJ ordersInfoa=new OrdersInfoJ(order);
             ordersInfoAList.add(ordersInfoa);
         }
         return ordersInfoAList;
@@ -390,13 +385,6 @@ public class OrdersHandler {
         ordersRepository.save(orders);
 
 
-
-
-
-
-
-
-
         return true;
     }
 
@@ -542,42 +530,42 @@ public class OrdersHandler {
 //        }
     }
 
-    @Data
-    class OrdersInfoA{
-        Integer orderID;
-        String hotelName;
-        String city;
-        String roomTypeName;
-        Integer customerID;
-        String customerName;
-        String telephone;
-
-        String ordertime;
-
-        String checkintime;
-
-        String checkouttime;
-
-        public OrdersInfoA(Orders order) {
-
-            this.orderID = order.getOrderid();
-            Hotel hotel=hotelRepository.findHotelByHotelid(order.getHotelid());
-            RoomType roomType=roomTypeRepository.findRoomTypeByRoomtypeid(order.getRoomtypeid());
-
-            this.hotelName = hotel.getHotelname();
-            this.city = hotel.getCityname();
-            this.roomTypeName = roomType.getRoomname();
-            this.customerID = order.getCustomerid();
-            Customer customer=customerRepository.findByCustomerid(customerID);
-            this.customerName = customer.getName();
-            this.telephone = customer.getTelephone();
-
-            this.ordertime=order.getOrdertime();
-            this.checkintime=order.getCheckintime();
-            this.checkouttime=order.getCheckouttime();
-        }
-
-    }
+//    @Data
+//    class OrdersInfoJ {
+//        Integer orderID;
+//        String hotelName;
+//        String city;
+//        String roomTypeName;
+//        Integer customerID;
+//        String customerName;
+//        String telephone;
+//
+//        String ordertime;
+//
+//        String checkintime;
+//
+//        String checkouttime;
+//
+//        public OrdersInfoJ(Orders order) {
+//
+//            this.orderID = order.getOrderid();
+//            Hotel hotel=hotelRepository.findHotelByHotelid(order.getHotelid());
+//            RoomType roomType=roomTypeRepository.findRoomTypeByRoomtypeid(order.getRoomtypeid());
+//
+//            this.hotelName = hotel.getHotelname();
+//            this.city = hotel.getCityname();
+//            this.roomTypeName = roomType.getRoomname();
+//            this.customerID = order.getCustomerid();
+//            Customer customer=customerRepository.findByCustomerid(customerID);
+//            this.customerName = customer.getName();
+//            this.telephone = customer.getTelephone();
+//
+//            this.ordertime=order.getOrdertime();
+//            this.checkintime=order.getCheckintime();
+//            this.checkouttime=order.getCheckouttime();
+//        }
+//
+//    }
 
 
     @Data
