@@ -6,6 +6,7 @@ public class seckillOrderInfo implements Serializable {
 
   String username;
     String  goodsname;
+    String time;
 
   public seckillOrderInfo(String username, String goodsname) {
     this.username = username;
