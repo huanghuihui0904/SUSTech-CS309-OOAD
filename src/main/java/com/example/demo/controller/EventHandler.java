@@ -3,8 +3,10 @@ package com.example.demo.controller;
 
 import com.example.demo.entity.Event;
 import com.example.demo.entity.Hotel;
+import com.example.demo.entity.RoomType;
 import com.example.demo.repository.EventRepository;
 import com.example.demo.repository.HotelRepository;
+import com.example.demo.repository.RoomTypeRepository;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -25,7 +27,8 @@ public class EventHandler {
   @Autowired
   HotelRepository hotelRepository;
 
-
+@Autowired
+  RoomTypeRepository roomTypeRepository;
   @Autowired
   JdbcTemplate jdbcTemplate;
 
@@ -82,6 +85,7 @@ public class EventHandler {
     Integer hotelid;
     String hotelname;
     Integer roomtypeid;
+    String roomtypename;
 
     String begintime;
     String endtime;
@@ -97,6 +101,8 @@ public class EventHandler {
       this.discountprice=event.getDiscountprice();
       Hotel hotel=hotelRepository.findHotelByHotelid(hotelid);
       this.hotelname=hotel.getHotelname();
+      RoomType r=roomTypeRepository.findRoomTypeByRoomtypeid(event.getRoomtypeid());
+      this.roomtypename=r.getRoomname();
     }
     public EventInfo(){
 
