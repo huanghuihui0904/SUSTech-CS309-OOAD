@@ -42,7 +42,7 @@ public class RoomTypeHandler {
     Integer roomtypeid;
     Integer hotelid;
     String roomname;
-    Integer remain;
+    String remain;
     Integer price;
     String introduction;
     Integer number;
@@ -153,7 +153,7 @@ public class RoomTypeHandler {
     String hotelName = "";
     String roomName = "";
     Integer price = 0;
-    Integer remain = 0;
+    String remain = "2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2";
     String introduction = "";
     Integer number = 0;
     //匹配
@@ -172,11 +172,11 @@ public class RoomTypeHandler {
         price = Integer.valueOf(js.get(i)[1]);
       }
     }
-    for (int i = 0; i < js.size(); i++) {
-      if (js.get(i)[0].equals("remain")) {
-        remain = Integer.valueOf(js.get(i)[1]);
-      }
-    }
+//    for (int i = 0; i < js.size(); i++) {
+//      if (js.get(i)[0].equals("remain")) {
+//        remain = js.get(i)[1];
+//      }
+//    }
     for (int i = 0; i < js.size(); i++) {
       if (js.get(i)[0].equals("introduction")) {
         introduction = js.get(i)[1];
@@ -239,7 +239,7 @@ public class RoomTypeHandler {
     }
 //
     int hotelid = tempt.getHotelid();
-    int remain = tempt.getRemain();
+    String remain = tempt.getRemain();
 
 
     RoomType newRoomType = new RoomType(roomTypeId, hotelid, roomTypeName, remain, price, introduction, number);
@@ -326,8 +326,27 @@ public class RoomTypeHandler {
     boolean breakfast;
 
   }
+  @GetMapping("/haveRoom")
+  public int[] have(@RequestParam("roomtypeid") Integer roomtypeid)  {
+  int[] have=new int[31];
+RoomType roomType=roomTypeRepository.findRoomTypeByRoomtypeid(roomtypeid);
+String[] remain=roomType.getRemain().split(",");
+    for (int i = 0; i < remain.length; i++) {
+      if(Integer.parseInt(remain[i])>0){
+        have[i]=1;
+      }else {
+        have[i]=0;
+      }
+    }
 
-  public Event findEvent() {
+
+
+
+
+  return have;
+  }
+
+    public Event findEvent() {
     List<Event> events = eventRepository.findAll();
     String cur = curTime();
     Event re = new Event();

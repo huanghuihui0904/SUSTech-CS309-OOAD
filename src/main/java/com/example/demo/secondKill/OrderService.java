@@ -35,16 +35,29 @@ seckillorderRepository.save(order);
 
   }
 
-
-  public void decrByOrder(String goodsname){
+//todo
+  public void decrByOrder(String roomtypeid){
+    String date="";
     System.out.println("decrby");
-    int roomtypeid=Integer.parseInt(goodsname);
-    RoomType roomType=roomTypeRepository.findRoomTypeByRoomtypeid(roomtypeid);
-    int remain=roomType.getRemain();
-    if(remain>0){
-      roomType.setRemain(remain-1);
+
+    RoomType roomType=roomTypeRepository.findRoomTypeByRoomtypeid(Integer.parseInt(roomtypeid));
+    String remian=roomType.getRemain();
+    String day=date.split("-")[2];
+    int dayint=(Integer.parseInt(day)-1)*2;
+    String daythat=remian.substring(dayint,dayint+1);
+    int thatramian=Integer.parseInt(daythat);
+    if(thatramian>0){
+      StringBuilder strBuilder = new StringBuilder(remian);
+      thatramian--;
+      char re=(thatramian+"").charAt(0);
+      strBuilder.setCharAt(dayint, re);
+      String str= strBuilder.toString();
+      roomType.setRemain(str);
       roomTypeRepository.save(roomType);
+    }else {
+      System.out.println("no remain");
     }
+
   }
 
 //  //校验库存
