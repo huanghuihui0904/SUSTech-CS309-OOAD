@@ -5,9 +5,11 @@ import com.example.demo.NonStaticResourceHttpRequestHandler;
 import com.example.demo.entity.Comment;
 import com.example.demo.entity.Hotel;
 import com.example.demo.entity.Orders;
+import com.example.demo.entity.RoomType;
 import com.example.demo.repository.CommentRepository;
 import com.example.demo.repository.HotelRepository;
 import com.example.demo.repository.OrdersRepository;
+import com.example.demo.repository.RoomTypeRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.apache.ibatis.annotations.Delete;
@@ -40,6 +42,9 @@ public class CommentHandler {
 
   @Autowired
   HotelRepository hotelRepository;
+
+  @Autowired
+  RoomTypeRepository roomTypeRepository;
 
   @Autowired
   OrdersRepository ordersRepository;
@@ -316,9 +321,9 @@ public class CommentHandler {
       this.picture3=comment.getPicture3();
       this.video=comment.getVideo();
       Orders orders=ordersRepository.findOrdersByCommentid(commentid);
-      Integer hotelid=orders.getHotelid();
-      Hotel hotel=hotelRepository.findHotelByHotelid(hotelid);
-      this.roomtypename=hotel.getHotelname();
+      Integer roomtypeid=orders.getRoomtypeid();
+      RoomType roomType=roomTypeRepository.findRoomTypeByRoomtypeid(roomtypeid);
+      this.roomtypename=roomType.getRoomname();
     }
 
 
