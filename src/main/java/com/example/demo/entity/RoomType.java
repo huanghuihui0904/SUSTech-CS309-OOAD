@@ -4,12 +4,13 @@ import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 
 @Entity
 @Data  //提供读写属性eg.getter setter tostring......
 @Table(name = "roomtype")
-public class RoomType {
+public class RoomType implements Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   Integer roomtypeid;
