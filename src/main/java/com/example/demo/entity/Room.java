@@ -15,7 +15,7 @@ public class Room {
   Integer roomid;
   Integer roomtypeid;
   String location;
-  Integer isordered;
+  String isordered;
 
   
 }

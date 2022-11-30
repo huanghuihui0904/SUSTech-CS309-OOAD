@@ -43,9 +43,25 @@ public class TimedTask {
 
 
     //每次0点开始 持续24个小时抢当天的
+    //0点更新 isordered和remain
     @Scheduled(cron = "0 0 0 ? * *")
 //    @Scheduled(cron = "0 4 20 28 11 ?")  //test only
     public String startJob() {
+
+        List<Room> roomList=roomRepository.findAll();
+        List<RoomType> roomTypeList=roomTypeRepository.findAll();
+        for (Room r:roomList) {
+            String isordered=r.getIsordered().substring(2)+",0";
+            String sql1 = "update room set isordered=? where roomid=?";
+            jdbcTemplate.update(sql1,isordered,r.getRoomid() );
+        }
+        for (RoomType rt:roomTypeList) {
+            int add=roomRepository.findRoomsByRoomtypeid(rt.getRoomtypeid()).size();
+            String remain=rt.getRemain().substring(2)+","+add;
+            String sql2 = "update roomtype set remain=? where roomtypeid=?";
+            jdbcTemplate.update(sql2,remain,rt.getRoomtypeid() );
+        }
+
         Integer maxId = jdbcTemplate.queryForObject("select MAX(eventid) from event", Integer.class);
         if (maxId == null) {
             maxId = 0;
@@ -55,23 +71,17 @@ public class TimedTask {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Event event = new Event();
 //        Integer count= jdbcTemplate.queryForObject("select count(*) from roomtype", Integer.class);
-        boolean isFound = false;
-        Integer roomTypeid = null;
-        while (!isFound) {
-            roomTypeid = jdbcTemplate.queryForObject(" select roomtypeid from roomtype  offset floor(random()* (select count(*) from roomtype)) LIMIT 1", Integer.class);
-            List<Room> roomList = roomRepository.findRoomsByRoomtypeid(roomTypeid);
-            for (Room r : roomList) {
-                if (r.getIsordered() == 0) {
-                    isFound = true;
-                    break;
-                }
+        RoomType roomType = null;
+        while (true) {
+            Integer roomTypeid = jdbcTemplate.queryForObject(" select roomtypeid from roomtype  offset floor(random()* (select count(*) from roomtype)) LIMIT 1", Integer.class);
+            roomType=roomTypeRepository.findRoomTypeByRoomtypeid(roomTypeid);
+            if (Integer.parseInt(String.valueOf(roomType.getRemain().charAt(0)))>0){
+                break;
             }
         }
 
-
-        RoomType roomType = roomTypeRepository.findRoomTypeByRoomtypeid(roomTypeid);
         event.setHotelid(roomType.getHotelid());
-        event.setRoomtypeid(roomTypeid);
+        event.setRoomtypeid(roomType.getRoomtypeid());
         event.setBegintime(format.format(now));
         Date d = new Date(now.getTime() + 24 * 60 * 60 * 1000 - 1);
         event.setEndtime(format.format(d));

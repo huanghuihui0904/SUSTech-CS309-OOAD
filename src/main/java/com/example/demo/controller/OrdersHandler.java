@@ -29,6 +29,9 @@ public class OrdersHandler {
     @Autowired
     RoomRepository roomRepository;
 
+    @Autowired
+    CommentRepository commentRepository;
+
 
     @Autowired
     JdbcTemplate jdbcTemplate;
@@ -294,9 +297,82 @@ public class OrdersHandler {
 
 
     @RequestMapping(value = "/delete",method = RequestMethod.POST)
-    public Orders deleteOrder(@RequestParam Integer id){
+    public Orders deleteOrder(@RequestParam Integer id) throws ParseException {
         // 删除语句
         Orders orders=ordersRepository.findOrderByOrderid(id);
+        SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        Integer cost=orders.getAmountpaid();
+        String checkintime=orders.getCheckintime();
+        String checkouttime=orders.getCheckouttime();
+
+        Integer roomid=orders.getRoomid();
+        Integer commentid=orders.getCommentid();
+        Integer customerid=orders.getCustomerid();
+        Room room=roomRepository.findRoomByRoomid(roomid);
+        Integer roomtypeid=room.getRoomtypeid();
+        RoomType roomType=roomTypeRepository.findRoomTypeByRoomtypeid(roomtypeid);
+        Comment comment=null;
+        if (commentid!=null){
+            comment=commentRepository.findAllByCommentid(commentid);
+        }
+        Customer customer=customerRepository.findByCustomerid(customerid);
+
+
+        Date checkin=format.parse(checkintime);
+        Date checkout=format.parse(checkouttime);
+        Date now=new Date();
+        int startIndex= (int) ((checkin.getTime()-now.getTime())/(1000*60*60*24));
+        int endIndex=(int) ((checkout.getTime()-now.getTime())/(1000*60*60*24));
+
+        String remain=roomType.getRemain();
+        String[] remains=remain.split(",");
+        String isOrdered=room.getIsordered();
+
+        StringBuilder currentIsordered= new StringBuilder();
+        StringBuilder currentRemain= new StringBuilder();
+
+
+        for (int i = startIndex; i <=endIndex ; i++) {
+            currentIsordered.append("0,");
+            int cur=Integer.parseInt(remains[i])+1;
+            currentRemain.append(cur).append(",");
+        }
+        String remainFin="";
+        String isOrderedFin="";
+
+        if (endIndex>=remain.length()) {
+            remainFin = remain.substring(0, startIndex*2) + currentRemain.substring(0,currentRemain.length()-1) ;
+            isOrderedFin=isOrdered.substring(0,startIndex*2)+currentIsordered.substring(0,currentIsordered.length()-1);
+        }else {
+            remainFin = remain.substring(0, startIndex*2) + currentRemain + remain.substring(2*endIndex+1 );
+            isOrderedFin=isOrdered.substring(0,startIndex*2)+currentIsordered+isOrdered.substring(2*endIndex+1);
+        }
+
+        //取消订单后 remain加回来
+        String sql1 = "update roomtype set remain=? where roomtypeid=?";
+        jdbcTemplate.update(sql1,remainFin,roomtypeid );
+
+        //取消订单后，isordered改回来
+        String sql2 = "update room set isOrdered=? where roomid=?";
+        jdbcTemplate.update(sql2,isOrderedFin,roomtypeid);
+
+        //取消订单后，customer积分减回去
+        String sql3 = "update customer set credit=? where customerid=?";
+        jdbcTemplate.update(sql3,customer.getCredits()-cost,customerid);
+
+        //取消订单后，customer钱加回去
+        String sql4 = "update customer set money=? where customerid=?";
+        jdbcTemplate.update(sql4,customer.getMoney()+cost,customerid);
+
+        //取消订单后，如果有评论删除评论
+        if (comment!=null){
+            String sql5 = "delete from comment where commentid=?";
+            jdbcTemplate.update(sql5,commentid);
+        }
+
+
+
         if (orders==null)return null;
         String sql = "delete from orders where orderid=?";
         jdbcTemplate.update(sql,id);
@@ -314,58 +390,107 @@ public class OrdersHandler {
 
 
     @PostMapping("/booking")
-    public boolean booking(@RequestBody bookInfo bookInfo){
+    public boolean booking(@RequestBody bookInfo bookInfo) throws ParseException {
         Integer maxId=jdbcTemplate.queryForObject("select MAX(orderid) from orders", Integer.class);
         if (maxId==null)maxId=0;
+        SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-        String roomType= bookInfo.getRoomType();
+        String roomTypeName= bookInfo.getRoomType();
         String hotelName=bookInfo.getHotelName();
         String userName=bookInfo.getUsername();
         Integer cost=bookInfo.getCost();
-//        return  userName +hotelName+ cost;
 
         Customer customer=customerRepository.findByName(userName);
         Hotel hotel=hotelRepository.findHotelByHotelname(hotelName);
+
         Integer customerid=customer.getCustomerid();
         Integer hotelid=hotel.getHotelid();
         List<RoomType> roomTypeList=roomTypeRepository.findRoomTypesByHotelid(hotelid);
         if (roomTypeList == null){
             return false;
         }
-        RoomType type = null;
+        RoomType roomtype = null;
         for (RoomType r: roomTypeList) {
-            if (Objects.equals(r.getRoomname(), roomType)){
-                type=r;
+            if (Objects.equals(r.getRoomname(), roomTypeName)){
+                roomtype=r;
                 break;
             }
         }
-        if ( type==null){
+        if ( roomtype==null){
             return false;
         }
-        Integer roomtypeid=type.getRoomtypeid();
+
+        Integer roomtypeid=roomtype.getRoomtypeid();
+
+
+
+        String startDate=bookInfo.getStartDate();
+        String endDate=bookInfo.getStartDate();
+        Date checkin=format.parse(startDate);
+        Date checkout=format.parse(endDate);
+        Date now=new Date();
+        int startIndex= (int) ((checkin.getTime()-now.getTime())/(1000*60*60*24));
+        int endIndex=(int) ((checkout.getTime()-now.getTime())/(1000*60*60*24));
+
         List<Room> roomList=roomRepository.findRoomsByRoomtypeid(roomtypeid);
         Room room=null;
-        for (Room r: roomList) {
-            if (r.getIsordered()==0){
+        for (Room r:roomList) {
+            String isOrderedInterval=r.getIsordered().substring(startIndex,endIndex+1);
+            if (!isOrderedInterval.contains("1")){
                 room=r;
                 break;
             }
         }
         if (room==null){
-            return  false;
+            return false;
         }
-        Integer roomid=room.getRoomid();
 
+
+
+        String remain=roomtype.getRemain();
+        String[] remains=remain.split(",");
+        String isOrdered=room.getIsordered();
+
+        StringBuilder currentIsordered= new StringBuilder();
+        StringBuilder currentRemain= new StringBuilder();
+
+
+        for (int i = startIndex; i <=endIndex ; i++) {
+            currentIsordered.append("0,");
+            int cur=Integer.parseInt(remains[i])+1;
+            currentRemain.append(cur).append(",");
+        }
+        String remainFin="";
+        String isOrderedFin="";
+
+        if (endIndex>=remain.length()) {
+            remainFin = remain.substring(0, startIndex*2) + currentRemain.substring(0,currentRemain.length()-1) ;
+            isOrderedFin=isOrdered.substring(0,startIndex*2)+currentIsordered.substring(0,currentIsordered.length()-1);
+        }else {
+            remainFin = remain.substring(0, startIndex*2) + currentRemain + remain.substring(2*endIndex+1);
+            isOrderedFin=isOrdered.substring(0,startIndex*2)+currentIsordered+isOrdered.substring(2*endIndex+1);
+        }
 
 
 
         if (customer.getMoney()<cost){
             return false;
         }
+        //订房扣钱
         String sql1 = "update customer set money=? where customerid=?";
         jdbcTemplate.update(sql1,customer.getMoney()-cost,customerid);
+
+        //订房加积分
         String sql2 = "update customer set credits=? where customerid=?";
         jdbcTemplate.update(sql2,customer.getCredits()+cost,customerid);
+
+        //订房，修改remain
+        String sql3 = "update roomtype set remain=? where roomtypeid=?";
+        jdbcTemplate.update(sql3,remainFin,roomtypeid);
+
+        //订房，修改isordered
+        String sql4 = "update room set isordered=? where roomid=?";
+        jdbcTemplate.update(sql4,isOrderedFin,room.getRoomtypeid());
 
 
         Orders orders=new Orders();
@@ -373,15 +498,14 @@ public class OrdersHandler {
         orders.setCustomerid(customerid);
         orders.setHotelid(hotelid);
         orders.setRoomtypeid(roomtypeid);
-        orders.setRoomid(roomid);
-        Date now=new Date();
-        SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        orders.setRoomid(room.getRoomid());
         String ordertime=format.format(now);
         orders.setOrdertime(ordertime);
         orders.setCheckintime(bookInfo.getStartDate());
         orders.setCheckouttime(bookInfo.getEndDate());
         orders.setAmountpaid(cost);
 
+        //订房增加order
         ordersRepository.save(orders);
 
 
@@ -395,10 +519,14 @@ public class OrdersHandler {
 
         String checkintime= modifyInfo.getCheckinTime();
         String checkouttime= modifyInfo.getCheckoutTime();
+
         ReturnInfo returnInfo=new ReturnInfo();
         Orders orders=ordersRepository.findOrderByOrderid(id);
         Integer customerId=orders.getCustomerid();
         Integer roomtypeId=orders.getRoomtypeid();
+        Integer roomid=orders.getRoomid();
+        Room room=roomRepository.findRoomByRoomid(roomid);
+
         RoomType roomType=roomTypeRepository.findRoomTypeByRoomtypeid(roomtypeId);
         Customer customer=customerRepository.findByCustomerid(customerId);
 
@@ -406,34 +534,112 @@ public class OrdersHandler {
         String ckin=orders.getCheckintime();
         String ckout=orders.getCheckouttime();
         Date ckind=format.parse(ckin);
-        Date ckoutd=format.parse(ckout);
-        int dif= (int) ((ckoutd.getTime()-ckind.getTime())/(1000*60*60*24));
-        int currentBack=dif*roomType.getPrice();
-
         Date checkout=format.parse(checkouttime);
         Date checkin=format.parse(checkintime);
+        Date ckoutd=format.parse(ckout);
+
+        int dif= (int) ((ckoutd.getTime()-ckind.getTime())/(1000*60*60*24));
+        int currentBack=dif*roomType.getPrice();
+        Date now=new Date();
+
+        int startIndex=(int) ((checkout.getTime()-now.getTime())/(1000*60*60*24));
+        int endIndex=(int) ((checkout.getTime()-now.getTime())/(1000*60*60*24));
+        int oldStart=(int) ((ckind.getTime()-now.getTime())/(1000*60*60*24));
+        int oldEnd=(int) ((ckoutd.getTime()-now.getTime())/(1000*60*60*24));
+
+        String remain=roomType.getRemain();
+        String isOrdered=room.getIsordered();
+//        String remainInterval=remain.substring(startIndex,endIndex);
+//        String isOrderedInterval=isOrdered.substring(startIndex,endIndex);
+
+        String[] oldremains=remain.split(",");
+        String[] oldisOrdereds=isOrdered.split(",");
+        StringBuilder r=new StringBuilder();
+        StringBuilder o=new StringBuilder();
+        for (int i = oldStart; i <=oldEnd ; i++) {
+            r.append(Integer.parseInt(oldremains[i])+1).append(",");
+            o.append("0,");
+        }
+
+        if (oldEnd>=remain.length()) {
+            remain = remain.substring(0, 2*oldStart) + r.substring(0,r.length()-1) ;
+            isOrdered=isOrdered.substring(0,2*oldStart)+o.substring(0,o.length()-1);
+        }else {
+            remain = remain.substring(0, 2*oldStart) +r+  remain.substring(2*oldEnd+1);
+            isOrdered=isOrdered.substring(0,2*oldStart)+o+isOrdered.substring(2*oldEnd+1);
+        }
+
+        String[] remains=remain.split(",");
+        String[] isOrdereds=isOrdered.split(",");
+
+
+        for (int i = startIndex; i <=endIndex ; i++) {
+            if (Integer.parseInt(remains[i])==0|| Objects.equals(isOrdereds[i], "1")){
+                returnInfo.setMoneyChange(currentBack);
+                returnInfo.setModifySucceeded(false);
+                returnInfo.setNoRoom(1);
+                return  returnInfo;
+            }
+        }
+
         int difference= (int) ((checkout.getTime()-checkin.getTime())/(1000*60*60*24));
         System.out.println(difference);
         int currentPaid=difference*roomType.getPrice();
         if (currentPaid>customer.getMoney()+currentBack){
             returnInfo.setMoneyChange(-currentPaid+currentBack);
             returnInfo.setModifySucceeded(false);
+            returnInfo.setNoRoom(0);
+            return returnInfo;
         }else {
             returnInfo.setMoneyChange(-currentPaid+currentBack);
             returnInfo.setModifySucceeded(true);
+            returnInfo.setNoRoom(0);
 
-
+            //修改订单时间
             String sql = "update orders set checkintime=? , checkouttime=? where orderid=?";
-
             jdbcTemplate.update(sql, checkintime, checkouttime, id);
 
-            String sql2 = "update customer set money=? where customerid=?";
+            StringBuilder currentRemain= new StringBuilder();
+            StringBuilder currentIsOrdered=new StringBuilder();
 
+            for (int i = startIndex; i <= endIndex; i++) {
+                int fin=Integer.parseInt(remains[i])-1;
+                currentRemain.append(fin).append(",");
+                currentIsOrdered.append("1,");
+            }
+
+            String remainFin="";
+            String isOrderedFin="";
+
+            if (endIndex>=remain.length()) {
+                remainFin = remain.substring(0, 2*startIndex) + currentRemain.substring(0,currentRemain.length()-1) ;
+                isOrderedFin=isOrdered.substring(0,2*startIndex)+currentIsOrdered.substring(0,currentIsOrdered.length()-1);
+            }else {
+                remainFin = remain.substring(0, 2*startIndex) + currentRemain + remain.substring(2*endIndex+1);
+                isOrderedFin=isOrdered.substring(0,2*startIndex)+currentIsOrdered+isOrdered.substring(2*endIndex+1);
+            }
+
+            //修改订单时间后，修改customer的钱
+            String sql2 = "update customer set money=? where customerid=?";
             jdbcTemplate.update(sql2,customer.getMoney()-currentPaid+currentBack,customerId);
 
+            //修改订单时间后，修改customer的积分
             String sql3 = "update customer set credits=? where customerid=?";
-
             jdbcTemplate.update(sql3,customer.getCredits()+currentPaid-currentBack,customerId);
+
+            //修改订单时间后，修改remain
+            String sql4 = "update roomtype set remain=? where roomtypeid=?";
+            jdbcTemplate.update(sql4,remainFin,roomtypeId );
+
+
+            //修改订单时间后，修改isordered
+            String sql5 = "update room set isordered=? where roomid=?";
+            jdbcTemplate.update(sql5,isOrderedFin,roomid );
+
+
+
+
+
         }
 
         return  returnInfo;
@@ -465,9 +671,11 @@ public class OrdersHandler {
         Integer orderID;
         String hotelName;
         Integer roomTypeID;
+        Integer roomid;
         String rommTypeName;
         Integer roomID;
-        String time;
+        String checkintime;
+        String checkouttime;
         Integer pay;
         public OrdersInfo(Orders orders) {
             this.orderID=orders.getOrderid();
@@ -477,7 +685,9 @@ public class OrdersHandler {
             RoomType roomType=roomTypeRepository.findRoomTypeByRoomtypeid(this.roomTypeID);
             this.rommTypeName=roomType.getRoomname();
             this.roomID=orders.getRoomid();
-            this.time=orders.getCheckintime();
+            this.checkintime=orders.getCheckintime();
+            this.checkouttime=orders.getCheckouttime();
+            this.roomid=orders.getRoomid();
             this.pay=orders.getAmountpaid();
         }
 
@@ -573,6 +783,7 @@ public class OrdersHandler {
     class ReturnInfo{
         boolean modifySucceeded;
         Integer moneyChange;
+        Integer noRoom;
     }
 
     @Data
