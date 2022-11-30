@@ -48,7 +48,7 @@ public class RoomTypeHandler {
     Integer number;
     Double afterEventPrice;
     Double discount;
-
+String hotelname;
     public reInfo() {
     }
 
@@ -62,6 +62,8 @@ public class RoomTypeHandler {
       this.number = r.getNumber();
       this.afterEventPrice = afterEventPrice;
       this.discount = discount;
+      Hotel hotel=hotelRepository.findHotelByHotelid(r.getHotelid());
+      this.hotelname=hotel.getHotelname();
     }
   }
 
@@ -153,7 +155,7 @@ public class RoomTypeHandler {
     String hotelName = "";
     String roomName = "";
     Integer price = 0;
-    String remain = "2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2";
+    String remain = "3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3";
     String introduction = "";
     Integer number = 0;
     //匹配
