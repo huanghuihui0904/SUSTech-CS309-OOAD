@@ -72,6 +72,9 @@ public boolean booking(MQBookInfo bookInfo) throws ParseException {
   Hotel hotel=hotelRepository.findHotelByHotelname(hotelName);
 
   Integer customerid=customer.getCustomerid();
+  if(hotel==null){
+    return false;
+  }
   Integer hotelid=hotel.getHotelid();
   List<RoomType> roomTypeList=roomTypeRepository.findRoomTypesByHotelid(hotelid);
   if (roomTypeList == null){
