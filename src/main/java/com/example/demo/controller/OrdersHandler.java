@@ -409,6 +409,12 @@ public class OrdersHandler {
 
     @PostMapping("/booking")
     public boolean booking(@RequestBody bookInfo bookInfo) throws ParseException {
+
+
+
+
+
+
         Integer maxId=jdbcTemplate.queryForObject("select MAX(orderid) from orders", Integer.class);
         if (maxId==null)maxId=0;
         SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -440,8 +446,6 @@ public class OrdersHandler {
 
         Integer roomtypeid=roomtype.getRoomtypeid();
 
-
-
         String startDate=bookInfo.getStartDate();
 
         String endDate=bookInfo.getEndDate();
@@ -455,16 +459,6 @@ public class OrdersHandler {
         int startIndex= (int) ((checkin.getTime()-now.getTime())/(1000*60*60*24));
         int endIndex=(int) ((checkout.getTime()-now.getTime())/(1000*60*60*24))-1;
 
-        System.out.println("----------------------------------------");
-        System.out.println(checkin);
-        System.out.println(checkout);
-        System.out.println(checkin.getTime()-now.getTime());
-        System.out.println(checkout.getTime()-now.getTime());
-        System.out.println(now);
-        System.out.println(startIndex);
-        System.out.println(endIndex);
-
-        System.out.println("-----------------------------------------");
 
         List<Room> roomList=roomRepository.findRoomsByRoomtypeid(roomtypeid);
         Room room=null;
@@ -542,7 +536,38 @@ public class OrdersHandler {
         String sql4 = "update room set isordered=? where roomid=?";
         jdbcTemplate.update(sql4,isOrderedFin,room.getRoomid());
 
-//        System.out.println(room.getRoomid());
+
+        addOrders(bookInfo,room.getRoomid(),roomtypeid);
+
+
+
+
+        return true;
+    }
+
+
+
+
+    public void addOrders(bookInfo bookInfo,Integer roomid,Integer roomtypeid) throws ParseException {
+        Integer maxId=jdbcTemplate.queryForObject("select MAX(orderid) from orders", Integer.class);
+        if (maxId==null)maxId=0;
+
+        SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        Date now1=new Date();
+        String now1String=format.format(now1);
+        String nowString=now1String.substring(0,11)+"00:00:00";
+        Date now=format.parse(nowString);
+        String hotelName=bookInfo.getHotelName();
+        String userName=bookInfo.getUsername();
+        Integer cost=bookInfo.getCost();
+
+        Customer customer=customerRepository.findByName(userName);
+        Hotel hotel=hotelRepository.findHotelByHotelname(hotelName);
+
+        Integer customerid=customer.getCustomerid();
+        Integer hotelid=hotel.getHotelid();
+
 
 
         Orders orders=new Orders();
@@ -550,22 +575,24 @@ public class OrdersHandler {
         orders.setCustomerid(customerid);
         orders.setHotelid(hotelid);
         orders.setRoomtypeid(roomtypeid);
-        orders.setRoomid(room.getRoomid());
+        orders.setRoomid(roomid);
         String ordertime=format.format(now);
         orders.setOrdertime(ordertime);
         orders.setCheckintime(bookInfo.getStartDate());
         orders.setCheckouttime(bookInfo.getEndDate());
         orders.setAmountpaid(cost);
-
-        //订房增加order
-        ordersRepository.save(orders);
-
-
-
-
-
-        return true;
     }
+
+
+
+
+
+
+
+
+
+
+
 
 
     @PutMapping("/modifyordertime")
