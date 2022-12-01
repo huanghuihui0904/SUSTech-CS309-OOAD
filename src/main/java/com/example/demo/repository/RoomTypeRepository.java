@@ -17,6 +17,8 @@ public interface RoomTypeRepository extends JpaRepository<RoomType,Integer> {
 
   public List<RoomType> findRoomTypesByHotelid(Integer hotelId);
 
+  public RoomType findRoomTypeByRoomname (String roomname);
+
 
 
   public void deleteRoomTypeByRoomtypeid(Integer roomTypeId);

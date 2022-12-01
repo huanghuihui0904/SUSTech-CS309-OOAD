@@ -321,13 +321,21 @@ public class OrdersHandler {
 
         Date checkin=format.parse(checkintime);
         Date checkout=format.parse(checkouttime);
-        Date now=new Date();
+
+
+        Date now1=new Date();
+        String now1String=format.format(now1);
+        String nowString=now1String.substring(0,11)+"00:00:00";
+        Date now=format.parse(nowString);
         int startIndex= (int) ((checkin.getTime()-now.getTime())/(1000*60*60*24));
-        int endIndex=(int) ((checkout.getTime()-now.getTime())/(1000*60*60*24));
+        int endIndex=(int) ((checkout.getTime()-now.getTime())/(1000*60*60*24))-1;
+
 
         String remain=roomType.getRemain();
         String[] remains=remain.split(",");
         String isOrdered=room.getIsordered();
+
+
 
         StringBuilder currentIsordered= new StringBuilder();
         StringBuilder currentRemain= new StringBuilder();
@@ -345,8 +353,18 @@ public class OrdersHandler {
             remainFin = remain.substring(0, startIndex*2) + currentRemain.substring(0,currentRemain.length()-1) ;
             isOrderedFin=isOrdered.substring(0,startIndex*2)+currentIsordered.substring(0,currentIsordered.length()-1);
         }else {
-            remainFin = remain.substring(0, startIndex*2) + currentRemain + remain.substring(2*endIndex+1 );
-            isOrderedFin=isOrdered.substring(0,startIndex*2)+currentIsordered+isOrdered.substring(2*endIndex+1);
+
+            remainFin = remain.substring(0, startIndex*2) + currentRemain + remain.substring(2*endIndex+2 );
+            isOrderedFin=isOrdered.substring(0,startIndex*2)+currentIsordered+isOrdered.substring(2*endIndex+2);
+
+            System.out.println("remain.substring(0, startIndex*2) "+remain.substring(0, startIndex*2) );
+            System.out.println("currentRemain "+currentRemain);
+            System.out.println("remain.substring(2*endIndex+1) "+remain.substring(2*endIndex+2));
+            System.out.println("isOrdered.substring(0, startIndex*2) "+isOrdered.substring(0, startIndex*2) );
+            System.out.println("currentisOrdered "+currentIsordered);
+            System.out.println("isOrdered.substring(2*endIndex+1) "+isOrdered.substring(2*endIndex+2));
+            System.out.println(remainFin);
+            System.out.println(isOrderedFin);
         }
 
         //取消订单后 remain加回来
@@ -355,10 +373,10 @@ public class OrdersHandler {
 
         //取消订单后，isordered改回来
         String sql2 = "update room set isOrdered=? where roomid=?";
-        jdbcTemplate.update(sql2,isOrderedFin,roomtypeid);
+        jdbcTemplate.update(sql2,isOrderedFin,roomid);
 
         //取消订单后，customer积分减回去
-        String sql3 = "update customer set credit=? where customerid=?";
+        String sql3 = "update customer set credits=? where customerid=?";
         jdbcTemplate.update(sql3,customer.getCredits()-cost,customerid);
 
         //取消订单后，customer钱加回去
@@ -425,52 +443,84 @@ public class OrdersHandler {
 
 
         String startDate=bookInfo.getStartDate();
-        String endDate=bookInfo.getStartDate();
+
+        String endDate=bookInfo.getEndDate();
         Date checkin=format.parse(startDate);
         Date checkout=format.parse(endDate);
-        Date now=new Date();
+        Date now1=new Date();
+        String now1String=format.format(now1);
+        String nowString=now1String.substring(0,11)+"00:00:00";
+        Date now=format.parse(nowString);
+
         int startIndex= (int) ((checkin.getTime()-now.getTime())/(1000*60*60*24));
-        int endIndex=(int) ((checkout.getTime()-now.getTime())/(1000*60*60*24));
+        int endIndex=(int) ((checkout.getTime()-now.getTime())/(1000*60*60*24))-1;
+
+        System.out.println("----------------------------------------");
+        System.out.println(checkin);
+        System.out.println(checkout);
+        System.out.println(checkin.getTime()-now.getTime());
+        System.out.println(checkout.getTime()-now.getTime());
+        System.out.println(now);
+        System.out.println(startIndex);
+        System.out.println(endIndex);
+
+        System.out.println("-----------------------------------------");
 
         List<Room> roomList=roomRepository.findRoomsByRoomtypeid(roomtypeid);
         Room room=null;
         for (Room r:roomList) {
-            String isOrderedInterval=r.getIsordered().substring(startIndex,endIndex+1);
+            String isOrderedInterval=r.getIsordered().substring(startIndex,endIndex+2);
             if (!isOrderedInterval.contains("1")){
+                System.out.println("R:"+isOrderedInterval);
                 room=r;
                 break;
             }
         }
         if (room==null){
+            System.out.println("No room");
             return false;
         }
 
 
 
         String remain=roomtype.getRemain();
+        System.out.println("Remain: "+remain);
         String[] remains=remain.split(",");
         String isOrdered=room.getIsordered();
+
+        if (remain.substring(0, startIndex*2).contains("0")){
+            return false;
+        }
 
         StringBuilder currentIsordered= new StringBuilder();
         StringBuilder currentRemain= new StringBuilder();
 
 
         for (int i = startIndex; i <=endIndex ; i++) {
-            currentIsordered.append("0,");
-            int cur=Integer.parseInt(remains[i])+1;
+            currentIsordered.append("1,");
+            int cur=Integer.parseInt(remains[i])-1;
             currentRemain.append(cur).append(",");
         }
         String remainFin="";
         String isOrderedFin="";
 
         if (endIndex>=remain.length()) {
+
             remainFin = remain.substring(0, startIndex*2) + currentRemain.substring(0,currentRemain.length()-1) ;
             isOrderedFin=isOrdered.substring(0,startIndex*2)+currentIsordered.substring(0,currentIsordered.length()-1);
         }else {
-            remainFin = remain.substring(0, startIndex*2) + currentRemain + remain.substring(2*endIndex+1);
-            isOrderedFin=isOrdered.substring(0,startIndex*2)+currentIsordered+isOrdered.substring(2*endIndex+1);
+            System.out.println("remain.substring(0, startIndex*2) "+remain.substring(0, startIndex*2) );
+            System.out.println("currentRemain"+currentRemain);
+            System.out.println("remain.substring(2*endIndex+1)"+remain.substring(2*endIndex+2));
+            remainFin = remain.substring(0, startIndex*2) + currentRemain + remain.substring(2*endIndex+2);
+            System.out.println("isOrdered.substring(0, startIndex*2) "+isOrdered.substring(0, startIndex*2) );
+            System.out.println("currentisOrdered"+currentIsordered);
+            System.out.println("isOrdered.substring(2*endIndex+1)"+isOrdered.substring(2*endIndex+2));
+            isOrderedFin=isOrdered.substring(0,startIndex*2)+currentIsordered+isOrdered.substring(2*endIndex+2);
         }
 
+        System.out.println(remainFin);
+        System.out.println(isOrderedFin);
 
 
         if (customer.getMoney()<cost){
@@ -490,7 +540,9 @@ public class OrdersHandler {
 
         //订房，修改isordered
         String sql4 = "update room set isordered=? where roomid=?";
-        jdbcTemplate.update(sql4,isOrderedFin,room.getRoomtypeid());
+        jdbcTemplate.update(sql4,isOrderedFin,room.getRoomid());
+
+//        System.out.println(room.getRoomid());
 
 
         Orders orders=new Orders();
@@ -507,6 +559,9 @@ public class OrdersHandler {
 
         //订房增加order
         ordersRepository.save(orders);
+
+
+
 
 
         return true;
@@ -540,12 +595,19 @@ public class OrdersHandler {
 
         int dif= (int) ((ckoutd.getTime()-ckind.getTime())/(1000*60*60*24));
         int currentBack=dif*roomType.getPrice();
-        Date now=new Date();
 
-        int startIndex=(int) ((checkout.getTime()-now.getTime())/(1000*60*60*24));
-        int endIndex=(int) ((checkout.getTime()-now.getTime())/(1000*60*60*24));
+
+        Date now1=new Date();
+        String now1String=format.format(now1);
+        String nowString=now1String.substring(0,11)+"00:00:00";
+        Date now=format.parse(nowString);
+
+
+
+        int startIndex=(int) ((checkin.getTime()-now.getTime())/(1000*60*60*24));
+        int endIndex=(int) ((checkout.getTime()-now.getTime())/(1000*60*60*24))-1;
         int oldStart=(int) ((ckind.getTime()-now.getTime())/(1000*60*60*24));
-        int oldEnd=(int) ((ckoutd.getTime()-now.getTime())/(1000*60*60*24));
+        int oldEnd=(int) ((ckoutd.getTime()-now.getTime())/(1000*60*60*24))-1;
 
         String remain=roomType.getRemain();
         String isOrdered=room.getIsordered();
@@ -565,8 +627,8 @@ public class OrdersHandler {
             remain = remain.substring(0, 2*oldStart) + r.substring(0,r.length()-1) ;
             isOrdered=isOrdered.substring(0,2*oldStart)+o.substring(0,o.length()-1);
         }else {
-            remain = remain.substring(0, 2*oldStart) +r+  remain.substring(2*oldEnd+1);
-            isOrdered=isOrdered.substring(0,2*oldStart)+o+isOrdered.substring(2*oldEnd+1);
+            remain = remain.substring(0, 2*oldStart) +r+  remain.substring(2*oldEnd+2);
+            isOrdered=isOrdered.substring(0,2*oldStart)+o+isOrdered.substring(2*oldEnd+2);
         }
 
         String[] remains=remain.split(",");
@@ -608,6 +670,11 @@ public class OrdersHandler {
                 currentIsOrdered.append("1,");
             }
 
+            System.out.println("------------------------");
+            System.out.println(startIndex);
+            System.out.println(endIndex);
+            System.out.println("------------------------");
+
             String remainFin="";
             String isOrderedFin="";
 
@@ -615,8 +682,16 @@ public class OrdersHandler {
                 remainFin = remain.substring(0, 2*startIndex) + currentRemain.substring(0,currentRemain.length()-1) ;
                 isOrderedFin=isOrdered.substring(0,2*startIndex)+currentIsOrdered.substring(0,currentIsOrdered.length()-1);
             }else {
-                remainFin = remain.substring(0, 2*startIndex) + currentRemain + remain.substring(2*endIndex+1);
-                isOrderedFin=isOrdered.substring(0,2*startIndex)+currentIsOrdered+isOrdered.substring(2*endIndex+1);
+                remainFin = remain.substring(0, 2*startIndex) + currentRemain + remain.substring(2*endIndex+2);
+                isOrderedFin=isOrdered.substring(0,2*startIndex)+currentIsOrdered+isOrdered.substring(2*endIndex+2);
+                System.out.println("remain.substring(0, startIndex*2) "+remain.substring(0, startIndex*2) );
+                System.out.println("currentRemain "+currentRemain);
+                System.out.println("remain.substring(2*endIndex+1) "+remain.substring(2*endIndex+2));
+                System.out.println("isOrdered.substring(0, startIndex*2) "+isOrdered.substring(0, startIndex*2) );
+                System.out.println("currentisOrdered "+currentIsOrdered);
+                System.out.println("isOrdered.substring(2*endIndex+1) "+isOrdered.substring(2*endIndex+2));
+                System.out.println(remainFin);
+                System.out.println(isOrderedFin);
             }
 
             //修改订单时间后，修改customer的钱
