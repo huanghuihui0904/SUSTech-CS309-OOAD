@@ -18,7 +18,7 @@ class DemoApplicationTests {
 //
 //    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.CHINA);
 //    System.out.println(formatter.format(d));
-    DateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    DateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd ");
     sdf1.setTimeZone(TimeZone.getTimeZone("GMT+8"));
     String date = sdf1.format(new Date());
     //20210409T113025.625+0800

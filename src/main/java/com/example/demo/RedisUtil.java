@@ -6,6 +6,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -18,16 +19,13 @@ import java.util.concurrent.TimeUnit;
  *  @author zjjlive@dist.com.cn
  */
 @Component
-public class RedisUtil {
-
+public class RedisUtil implements Serializable {
+  private static final long serialVersionUID = -1;
   @Autowired
   private RedisTemplate<String, Object> redisTemplate;
-  /**
-   * 对指定key的键值减一
-   * @param key
-   * @return
-   */
-  public Long decrBy(String key) {
+
+  public Long decrBy(Integer key1) {
+    String key=key1.toString();
     return redisTemplate.opsForValue().decrement(key);
   }
   public RedisUtil(RedisTemplate<String, Object> redisTemplate) {
@@ -97,7 +95,7 @@ public class RedisUtil {
    * @return 值
    */
   public Object get(String key){
-    return key==null?null:redisTemplate.opsForValue().get(key);
+    return redisTemplate.opsForValue().get(key);
   }
 
   /**

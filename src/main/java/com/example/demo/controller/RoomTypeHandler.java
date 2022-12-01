@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.RedisUtil;
 import com.example.demo.entity.Event;
 import com.example.demo.entity.Hotel;
 import com.example.demo.entity.RoomType;
@@ -18,17 +19,15 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
+import java.util.*;
 
 @RestController
 @RequestMapping(value = "/roomtype")
 public class RoomTypeHandler {
   @Autowired
   RoomTypeRepository roomTypeRepository;
-
+@Autowired
+  RedisUtil redisUtil;
   @Autowired
   HotelRepository hotelRepository;
 
@@ -205,7 +204,11 @@ String hotelname;
   @PostMapping("/updateRoomType")
   public String updateRoomType(@RequestBody String str) {
     List<String[]> js = JsonUtil.decodeJSON(str);
-
+    for (int i = 0; i < js.size(); i++) {
+      System.out.println(js.get(i)[0]+"  "+js.get(i)[1]);
+    }
+String managertoken="";
+String managername="";
     int roomTypeId = 0;
     for (int i = 0; i < js.size(); i++) {
       if (js.get(i)[0].equals("roomTypeId")) {
@@ -235,17 +238,41 @@ String hotelname;
       }
     }
     for (int i = 0; i < js.size(); i++) {
+      if (js.get(i)[0].equals("managertoken")) {
+        managertoken = js.get(i)[1].replace("\"","");
+      }
+    }
+    for (int i = 0; i < js.size(); i++) {
+      if (js.get(i)[0].equals("managername")) {
+        managername = js.get(i)[1];
+      }
+    }
+    for (int i = 0; i < js.size(); i++) {
       if (js.get(i)[0].equals("number")) {
         number = Integer.parseInt(js.get(i)[1]);
       }
     }
-//
+//token check
+  if(!redisUtil.hasKey(managername)){
+    System.out.println("has");
+    return "token out of date";
+  }
+//    System.out.println(ob);
+  String ob=redisUtil.get(managername).toString();
+    System.out.println(ob);
+  if(ob==null||!ob.equals(managertoken)){
+    System.out.println("huhu");
+    return "token wrong";
+  }
+
+
     int hotelid = tempt.getHotelid();
     String remain = tempt.getRemain();
 
 
     RoomType newRoomType = new RoomType(roomTypeId, hotelid, roomTypeName, remain, price, introduction, number);
     RoomType re = roomTypeRepository.save(newRoomType);
+
     if (re != null) {
       return "update ok";
     } else {
