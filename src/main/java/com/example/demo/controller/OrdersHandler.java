@@ -747,6 +747,8 @@ public class OrdersHandler {
         orders.setCheckintime(bookInfo.getStartDate());
         orders.setCheckouttime(bookInfo.getEndDate());
         orders.setAmountpaid(cost);
+
+        ordersRepository.save(orders);
     }
 
 
