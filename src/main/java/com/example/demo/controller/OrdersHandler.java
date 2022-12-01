@@ -33,6 +33,8 @@ public class OrdersHandler {
     @Autowired
     CommentRepository commentRepository;
 
+    Calendar calendar = Calendar.getInstance();
+
 @Autowired
     RedisUtil redisUtil;
     @Autowired
@@ -539,6 +541,16 @@ public class OrdersHandler {
         //订房增加order
         ordersRepository.save(orders);
 
+        //发送订房成功的信息
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH) + 1;   //month from 0~11, 1 for offset
+        int day = calendar.get(Calendar.DATE);
+        String curDate = year + "-" + month + "-" + day;
+        String orderMessage = "尊敬的" + userName + ",您已成功预订" + startDate + "至" + endDate + "时段入住"
+                + hotelName + "的" + roomTypeName + "房间号为：" + room.getLocation() +  "。若您有任何疑问，请在聊天窗口与任意客服进行沟通，我们将随时为您提供24小时一对一管家式贴心服务。";
+        jdbcTemplate.update("insert into message(messageFromId, messageFromName, messageToId, messageTime, content) " +
+                "values (?, ?, ?, ?, ?);", 10000, "BOT", customerid, curDate, orderMessage);
+
         return true;
     }
 
@@ -684,6 +696,16 @@ public class OrdersHandler {
 
 
         addOrders(bookInfo,room.getRoomid(),roomtypeid);
+
+        //发送订房成功的信息
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH) + 1;   //month from 0~11, 1 for offset
+        int day = calendar.get(Calendar.DATE);
+        String curDate = year + "-" + month + "-" + day;
+        String orderMessage = "尊敬的" + userName + ",您已成功预订" + startDate + "至" + endDate + "时段入住"
+                + hotelName + "的" + roomTypeName + "。若您有任何疑问，请在聊天窗口与任意客服进行沟通，我们将随时为您提供24小时一对一管家式贴心服务。";
+        jdbcTemplate.update("insert into message(messageFromId, messageFromName, messageToId, messageTime, content) " +
+                "values (?, ?, ?, ?, ?);", 10000, "BOT", customerid, curDate, orderMessage);
 
         return true;
     }
