@@ -7,6 +7,7 @@ import com.example.demo.repository.*;
 import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
@@ -411,7 +412,7 @@ public class OrdersHandler {
 
 
     @PostMapping("/bookroom")
-    public boolean bookroom(@RequestBody BookroomInfo bookroomInfo) throws ParseException {
+    public ResponseEntity bookroom(@RequestBody BookroomInfo bookroomInfo) throws ParseException {
         Integer maxId=jdbcTemplate.queryForObject("select MAX(orderid) from orders", Integer.class);
         if (maxId==null)maxId=0;
         SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -424,12 +425,15 @@ public class OrdersHandler {
 
         Customer customer=customerRepository.findByName(userName);
         Hotel hotel=hotelRepository.findHotelByHotelname(hotelName);
-
+        if (hotel==null||customer==null){
+            return ResponseEntity.status(202).body(false);
+        }
+//        assert hotel!=null;
         Integer customerid=customer.getCustomerid();
         Integer hotelid=hotel.getHotelid();
         List<RoomType> roomTypeList=roomTypeRepository.findRoomTypesByHotelid(hotelid);
         if (roomTypeList == null){
-            return false;
+            return ResponseEntity.status(201).body(false);
         }
         RoomType roomtype = null;
         for (RoomType r: roomTypeList) {
@@ -439,7 +443,7 @@ public class OrdersHandler {
             }
         }
         if ( roomtype==null){
-            return false;
+            return ResponseEntity.status(201).body(false);
         }
 
         Integer roomtypeid=roomtype.getRoomtypeid();
@@ -467,7 +471,7 @@ public class OrdersHandler {
         }
         if (room==null){
             System.out.println("No room or Room error");
-            return false;
+            return ResponseEntity.status(201).body(false);
         }
         String remain=roomtype.getRemain();
         System.out.println("Remain: "+remain);
@@ -477,7 +481,7 @@ public class OrdersHandler {
 
         if (isOrdered.substring(startIndex*2, 2*endIndex+2).contains("1")){
             System.out.println("No room");
-            return false;
+            return ResponseEntity.status(201).body(false);
         }
 
 
@@ -513,7 +517,7 @@ public class OrdersHandler {
 
 
         if (customer.getMoney()<cost){
-            return false;
+            return ResponseEntity.status(201).body(false);
         }
         //订房扣钱
         String sql1 = "update customer set money=? where customerid=?";
@@ -558,16 +562,13 @@ public class OrdersHandler {
         jdbcTemplate.update("insert into message(messageFromId, messageFromName, messageToId, messageTime, content) " +
                 "values (?, ?, ?, ?, ?);", 10000, "BOT", customerid, curDate, orderMessage);
 
-        return true;
+        return ResponseEntity.status(200).body(true);
     }
 
 
 
     @PostMapping("/booking")
-    public boolean booking(@RequestBody BookInfo bookInfo) throws ParseException {
-
-
-
+    public ResponseEntity booking(@RequestBody BookInfo bookInfo) throws ParseException {
 
         Integer maxId=jdbcTemplate.queryForObject("select MAX(orderid) from orders", Integer.class);
         if (maxId==null)maxId=0;
@@ -585,7 +586,7 @@ public class OrdersHandler {
         Integer hotelid=hotel.getHotelid();
         List<RoomType> roomTypeList=roomTypeRepository.findRoomTypesByHotelid(hotelid);
         if (roomTypeList == null){
-            return false;
+            return ResponseEntity.status(201).body(false);
         }
         RoomType roomtype = null;
         for (RoomType r: roomTypeList) {
@@ -595,7 +596,7 @@ public class OrdersHandler {
             }
         }
         if ( roomtype==null){
-            return false;
+            return ResponseEntity.status(201).body(false);
         }
 
         Integer roomtypeid=roomtype.getRoomtypeid();
@@ -605,7 +606,7 @@ public class OrdersHandler {
                 if(Integer.parseInt(redisUtil.get(roomtypeid+"").toString())>0){
                     redisUtil.decrBy(roomtypeid);
                 }else {
-                    return false;
+                    return ResponseEntity.status(201).body(false);
                 }
             }else {
 
@@ -640,7 +641,7 @@ public class OrdersHandler {
         }
         if (room==null){
             System.out.println("No room");
-            return false;
+            return ResponseEntity.status(201).body(false);
         }
         String remain=roomtype.getRemain();
         System.out.println("Remain: "+remain);
@@ -649,7 +650,7 @@ public class OrdersHandler {
 
         if (remain.substring(startIndex*2, 2*endIndex+2).contains("0")){
             System.out.println("No room");
-            return false;
+            return ResponseEntity.status(201).body(false);
         }
 
         StringBuilder currentIsordered= new StringBuilder();
@@ -684,7 +685,7 @@ public class OrdersHandler {
 
 
         if (customer.getMoney()<cost){
-            return false;
+            return ResponseEntity.status(201).body(false);
         }
         //订房扣钱
         String sql1 = "update customer set money=? where customerid=?";
@@ -715,7 +716,7 @@ public class OrdersHandler {
         jdbcTemplate.update("insert into message(messageFromId, messageFromName, messageToId, messageTime, content) " +
                 "values (?, ?, ?, ?, ?);", 10000, "BOT", customerid, curDate, orderMessage);
 
-        return true;
+        return ResponseEntity.status(200).body(true);
     }
 
 
