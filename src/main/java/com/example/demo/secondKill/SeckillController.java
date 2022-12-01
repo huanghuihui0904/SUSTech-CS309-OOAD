@@ -6,6 +6,7 @@ import com.example.demo.entity.*;
 import com.example.demo.repository.*;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -46,7 +47,7 @@ public class SeckillController {
 
   Calendar calendar = Calendar.getInstance();
 @PostMapping()
-  public boolean sec(@RequestBody MQBookInfo bookInfo)  {
+  public ResponseEntity sec(@RequestBody MQBookInfo bookInfo)  {
 
     String message = null;
   System.out.println(bookInfo.roomtypeid);
@@ -54,7 +55,7 @@ public class SeckillController {
   if(redisUtil.hasKey(bookInfo.roomtypeid+"")){
 
   }else {
-    return false;
+    return ResponseEntity.status(201).body(false);
   }
     Long decrByResult = redisUtil.decrBy(bookInfo.roomtypeid);
 //    seckillOrderInfo seckillorderinfo=new seckillOrderInfo(username,goodsname);
@@ -68,13 +69,13 @@ public class SeckillController {
 
       //发消息给订单消息队列，创建订单
       rabbitTemplate.convertAndSend(MyRabbitMQConfig.ORDER_EXCHANGE, MyRabbitMQConfig.ORDER_ROUTING_KEY, bookInfo);
-return true;
+return ResponseEntity.status(200).body(false);
       //      message = "酒店" + bookInfo.hotelName+" 房型 "+bookInfo.roomType + "秒杀成功";
     } else {
       /**
        * 说明该商品的库存量没有剩余，直接返回秒杀失败的消息给用户
        */
-      return false;
+      return ResponseEntity.status(201).body(false);
 //      message ="酒店" + bookInfo.hotelName+" 房型 "+bookInfo.roomType + "秒杀商品的库存量没有剩余,秒杀结束";
     }
 
