@@ -13,6 +13,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -30,93 +31,102 @@ public class GiftOrderHandler {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
-    @RequestMapping(value = "/getbyid",method = RequestMethod.GET)
-    public GiftOrder getbyid(@RequestParam("id") int id){
-        GiftOrder giftOrder=  giftOrderRepository.findGiftOrderByGiftorderid(id);
+    Calendar calendar = Calendar.getInstance();
+
+    @RequestMapping(value = "/getbyid", method = RequestMethod.GET)
+    public GiftOrder getbyid(@RequestParam("id") int id) {
+        GiftOrder giftOrder = giftOrderRepository.findGiftOrderByGiftorderid(id);
         return giftOrder;
     }
 
     @GetMapping("/findAll")
-    public List findAll(){
-        List<GiftOrder> giftOrders= giftOrderRepository.findAll();
+    public List findAll() {
+        List<GiftOrder> giftOrders = giftOrderRepository.findAll();
         return giftOrders;
     }
 
     @PostMapping("/deletebygiftorderid")
-    public String deletebygiftorderid(@RequestParam("id") int id){
+    public String deletebygiftorderid(@RequestParam("id") int id) {
         // 删除语句
         String sql = "delete from giftorder where giftorderid=?";
-        jdbcTemplate.update(sql,id);
+        jdbcTemplate.update(sql, id);
         // 查询
         return "delete by id Ok";
     }
+
     @PostMapping("/deletebycustomerid")
-    public String deletebycustomerid(@RequestParam("id") int id){
+    public String deletebycustomerid(@RequestParam("id") int id) {
         // 删除语句
         String sql = "delete from giftorder where customerid=?";
-        jdbcTemplate.update(sql,id);
+        jdbcTemplate.update(sql, id);
         // 查询
         return "delete by id Ok";
     }
-
-
-
-
 
 
     @PostMapping("/creategiftorder")
-    public Boolean   insert(@RequestBody GiftOrderInfo giftOrderInfo){
+    public Boolean insert(@RequestBody GiftOrderInfo giftOrderInfo) {
 
-        String giftName=giftOrderInfo.getGiftName();
-        Integer customerid=giftOrderInfo.getUserID();
-        Integer amount=giftOrderInfo.getAmount();
+        String giftName = giftOrderInfo.getGiftName();
+        Integer customerid = giftOrderInfo.getUserID();
+        Integer amount = giftOrderInfo.getAmount();
 
-        Customer customer=customerRepository.findByCustomerid(customerid);
-        Gift gift=giftRepository.findGiftByGiftname(giftName);
-        if (customer==null||gift==null){
+        Customer customer = customerRepository.findByCustomerid(customerid);
+        Gift gift = giftRepository.findGiftByGiftname(giftName);
+        if (customer == null || gift == null) {
             System.out.println(customer);
             System.out.println(gift);
             System.out.println(giftName);
-            gift=giftRepository.findGiftByGiftname("葡萄酒");
+            gift = giftRepository.findGiftByGiftname("葡萄酒");
             System.out.println(gift);
             return false;
         }
-        Integer credit=customer.getCredits();
+        Integer credit = customer.getCredits();
 
 
-        if (credit-amount*gift.getCredits()<0){
-            System.out.println(credit-amount*gift.getCredits());
+        if (credit - amount * gift.getCredits() < 0) {
+            System.out.println(credit - amount * gift.getCredits());
             return false;
         }
 
 
+        Date now = new Date();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-        Date now=new Date();
-        SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-        String ordertime=format.format(now);
+        String ordertime = format.format(now);
 
         Integer maxId = jdbcTemplate.queryForObject("select MAX(giftorderid) from giftorder", Integer.class);
-        if (maxId==null)maxId=0;
+        if (maxId == null) maxId = 0;
 
 
-        String sql="update customer set credits=? where customerid=?";
-        jdbcTemplate.update(sql,credit-amount*gift.getCredits(),customerid);
+        String sql = "update customer set credits=? where customerid=?";
+        jdbcTemplate.update(sql, credit - amount * gift.getCredits(), customerid);
 
-        GiftOrder giftOrder=new GiftOrder(customerid,giftName,amount,ordertime,giftOrderInfo.getAddress(),giftOrderInfo.getUserName());
-        giftOrder.setGiftorderid(maxId+1);
+        GiftOrder giftOrder = new GiftOrder(customerid, giftName, amount, ordertime, giftOrderInfo.getAddress(), giftOrderInfo.getUserName());
+        giftOrder.setGiftorderid(maxId + 1);
 
 
         giftOrderRepository.save(giftOrder);
+
+        // 发送giftOrder信息
+        String customerName = customer.getName();
+        //giftName
+        String giftOrderMessage = "尊敬的" + customerName + ", 您的" + giftName + "正在寄出，"
+                + "您的礼品单号是: " + giftOrder.getGiftorderid() + ", 祝您生活愉快！";
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH) + 1;   //month from 0~11, 1 for offset
+        int day = calendar.get(Calendar.DATE);
+        String curDate = year + "-" + month + "-" + day;
+        jdbcTemplate.update("insert into message(messageFromId, messageFromName, messageToId, messageTime, content) " +
+                "values (?, ?, ?, ?, ?);", 10000, "BOT", customerid, curDate, giftOrderMessage);
 
         return true;
     }
 
 
-
     @Data
     static
-    class GiftOrderInfo{
+    class GiftOrderInfo {
         private Integer userID;
         private String giftName;
         private String userName;
