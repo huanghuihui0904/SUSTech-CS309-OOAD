@@ -71,7 +71,7 @@ public class SeckillController {
 //      rabbitTemplate.convertAndSend(MyRabbitMQConfig.STORY_EXCHANGE, MyRabbitMQConfig.STORY_ROUTING_KEY, bookInfo.roomtypeid);
 
       //发消息给订单消息队列，创建订单
-      rabbitTemplate.convertAndSend("hello",bookInfo);
+      rabbitTemplate.convertAndSend("order",bookInfo);
 return ResponseEntity.status(200).body(true);
       //      message = "酒店" + bookInfo.hotelName+" 房型 "+bookInfo.roomType + "秒杀成功";
     } else {
