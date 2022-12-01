@@ -457,8 +457,15 @@ public class OrdersHandler {
         int startIndex= (int) ((checkin.getTime()-now.getTime())/(1000*60*60*24));
         int endIndex=(int) ((checkout.getTime()-now.getTime())/(1000*60*60*24))-1;
 
-        Room room=roomRepository.findRoomByLocation(roomlocation);
-        if (room==null|| !Objects.equals(roomtypeid, room.getRoomtypeid())){
+        List<Room> roomList=roomRepository.findRoomByLocation(roomlocation);
+        Room room=null;
+        for (Room r:roomList) {
+            if (Objects.equals(r.getRoomtypeid(), roomtypeid)){
+                room=r;
+               break;
+            }
+        }
+        if (room==null){
             System.out.println("No room or Room error");
             return false;
         }
@@ -532,7 +539,7 @@ public class OrdersHandler {
         orders.setHotelid(hotelid);
         orders.setRoomtypeid(roomtypeid);
         orders.setRoomid(room.getRoomid());
-        String ordertime=format.format(now);
+        String ordertime=format.format(now1);
         orders.setOrdertime(ordertime);
         orders.setCheckintime(bookroomInfo.getStartDate());
         orders.setCheckouttime(bookroomInfo.getEndDate());
@@ -723,7 +730,6 @@ public class OrdersHandler {
         Date now1=new Date();
         String now1String=format.format(now1);
         String nowString=now1String.substring(0,11)+"00:00:00";
-        Date now=format.parse(nowString);
         String hotelName=bookInfo.getHotelName();
         String userName=bookInfo.getUsername();
         Integer cost=bookInfo.getCost();
@@ -742,7 +748,7 @@ public class OrdersHandler {
         orders.setHotelid(hotelid);
         orders.setRoomtypeid(roomtypeid);
         orders.setRoomid(roomid);
-        String ordertime=format.format(now);
+        String ordertime=format.format(now1);
         orders.setOrdertime(ordertime);
         orders.setCheckintime(bookInfo.getStartDate());
         orders.setCheckouttime(bookInfo.getEndDate());

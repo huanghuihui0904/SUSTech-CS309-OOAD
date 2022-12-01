@@ -13,7 +13,7 @@ public interface RoomRepository extends JpaRepository<Room,Integer> {
   //    @Query(value = "select * from orders",nativeQuery = true)
   public List<Room> findAll();
 
-  public Room findRoomByLocation(String location);
+  public List<Room> findRoomByLocation(String location);
 
 
 }
