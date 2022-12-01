@@ -45,11 +45,17 @@ public class SeckillController {
 //   */
 
   Calendar calendar = Calendar.getInstance();
-  @PostMapping("/booking")
-  public String sec(@RequestBody MQOrderService.MQBookInfo bookInfo)  {
+@PostMapping()
+  public String sec(@RequestBody MQBookInfo bookInfo)  {
 
     String message = null;
+  System.out.println(bookInfo.roomtypeid);
     //调用redis给相应商品库存量减一
+  if(redisUtil.hasKey(bookInfo.roomtypeid+"")){
+
+  }else {
+    return "no this roomtypeid";
+  }
     Long decrByResult = redisUtil.decrBy(bookInfo.roomtypeid);
 //    seckillOrderInfo seckillorderinfo=new seckillOrderInfo(username,goodsname);
     if (decrByResult >= 0) {
