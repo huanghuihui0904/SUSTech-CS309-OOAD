@@ -984,6 +984,8 @@ public class OrdersHandler {
         String checkOutTime;
 
         String cityName;
+
+        Integer orderid;
         public OrdersInfoJ(Orders orders) {
             Integer roomTypeID=orders.getRoomtypeid();
             Integer customerID=orders.getCustomerid();
@@ -1010,6 +1012,7 @@ public class OrdersHandler {
             this.orderTime=orders.getOrdertime();
             this.checkOutTime=orders.getCheckouttime();
             this.checkInTime=orders.getCheckintime();
+            this.orderid=orders.getOrderid();
 
         }
 //

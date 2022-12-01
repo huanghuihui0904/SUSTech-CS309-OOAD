@@ -174,7 +174,7 @@ public class CommentHandler {
 
 
     if (commentInfo.getPicture1()!=null) {
-      String fileName=commentInfo.getPicture1().getOriginalFilename();
+      String fileName=commentInfo.getPicture1().getOriginalFilename()+"picture1";
 //      int index=fileName.lastIndexOf(".");
 //      String suffix=fileName.substring(index);
       String suffix=".png";
@@ -192,7 +192,7 @@ public class CommentHandler {
       pic1= "http://10.26.111.227:8888/comment/getphoto/"+commentid +fileName+suffix;
     }
     if (commentInfo.getPicture2()!=null){
-      String fileName=commentInfo.getPicture2().getOriginalFilename();
+      String fileName=commentInfo.getPicture2().getOriginalFilename()+"picture2";
 //      int index=fileName.lastIndexOf(".");
 //      String suffix=fileName.substring(index);
       String suffix=".png";
@@ -203,7 +203,7 @@ public class CommentHandler {
       pic2="http://10.26.111.227:8888/comment/getphoto/"+commentid +fileName+suffix;
 
     }if (commentInfo.getPicture3()!=null){
-      String fileName=commentInfo.getPicture3().getOriginalFilename();
+      String fileName=commentInfo.getPicture3().getOriginalFilename()+"picture3";
 //      int index=fileName.lastIndexOf(".");
 //      String suffix=fileName.substring(index);
       String suffix=".png";
@@ -214,7 +214,7 @@ public class CommentHandler {
       pic3="http://10.26.111.227:8888/comment/getphoto/"+commentid +fileName+suffix;
 
     }if (commentInfo.getVideo()!=null){
-      String fileName=commentInfo.getVideo().getOriginalFilename();
+      String fileName=commentInfo.getVideo().getOriginalFilename()+"video";
 //      int index=fileName.lastIndexOf(".");
 //      String suffix=fileName.substring(index);
       String suffix=".mp4";
