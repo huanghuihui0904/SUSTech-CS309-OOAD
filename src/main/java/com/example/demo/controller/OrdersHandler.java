@@ -916,9 +916,8 @@ public class OrdersHandler {
         Integer orderID;
         String hotelName;
         Integer roomTypeID;
-        Integer roomid;
         String rommTypeName;
-        Integer roomID;
+        String roomid;
         String checkintime;
         String checkouttime;
         Integer pay;
@@ -929,10 +928,11 @@ public class OrdersHandler {
             this.roomTypeID=orders.getRoomtypeid();
             RoomType roomType=roomTypeRepository.findRoomTypeByRoomtypeid(this.roomTypeID);
             this.rommTypeName=roomType.getRoomname();
-            this.roomID=orders.getRoomid();
+            Integer roomID=orders.getRoomid();
+            Room room=roomRepository.findRoomByRoomid(roomID);
             this.checkintime=orders.getCheckintime();
             this.checkouttime=orders.getCheckouttime();
-            this.roomid=orders.getRoomid();
+            this.roomid=room.getLocation();
             this.pay=orders.getAmountpaid();
         }
 
