@@ -207,8 +207,7 @@ String hotelname;
     for (int i = 0; i < js.size(); i++) {
       System.out.println(js.get(i)[0]+"  "+js.get(i)[1]);
     }
-String managertoken="";
-String managername="";
+
     int roomTypeId = 0;
     for (int i = 0; i < js.size(); i++) {
       if (js.get(i)[0].equals("roomTypeId")) {
@@ -237,33 +236,33 @@ String managername="";
         introduction = js.get(i)[1];
       }
     }
-    for (int i = 0; i < js.size(); i++) {
-      if (js.get(i)[0].equals("managertoken")) {
-        managertoken = js.get(i)[1].replace("\"","");
-      }
-    }
-    for (int i = 0; i < js.size(); i++) {
-      if (js.get(i)[0].equals("managername")) {
-        managername = js.get(i)[1];
-      }
-    }
+//    for (int i = 0; i < js.size(); i++) {
+//      if (js.get(i)[0].equals("managertoken")) {
+//        managertoken = js.get(i)[1].replace("\"","");
+//      }
+//    }
+//    for (int i = 0; i < js.size(); i++) {
+//      if (js.get(i)[0].equals("managername")) {
+//        managername = js.get(i)[1];
+//      }
+//    }
     for (int i = 0; i < js.size(); i++) {
       if (js.get(i)[0].equals("number")) {
         number = Integer.parseInt(js.get(i)[1]);
       }
     }
 //token check
-  if(!redisUtil.hasKey(managername)){
-    System.out.println("has");
-    return "token out of date";
-  }
+//  if(!redisUtil.hasKey(managername)){
+//    System.out.println("has");
+//    return "token out of date";
+//  }
 //    System.out.println(ob);
-  String ob=redisUtil.get(managername).toString();
-    System.out.println(ob);
-  if(ob==null||!ob.equals(managertoken)){
-    System.out.println("huhu");
-    return "token wrong";
-  }
+//  String ob=redisUtil.get(managername).toString();
+//    System.out.println(ob);
+//  if(ob==null||!ob.equals(managertoken)){
+//    System.out.println("huhu");
+//    return "token wrong";
+//  }
 
 
     int hotelid = tempt.getHotelid();
