@@ -5,7 +5,7 @@ import lombok.Data;
 import java.io.Serializable;
 
 @Data
-class MQBookInfo implements Serializable {
+ class MQBookInfo implements Serializable {
   String startDate;
   String endDate;
   String roomType;
@@ -35,5 +35,8 @@ class MQBookInfo implements Serializable {
 
   public String getUsername() {
     return username;
+  }
+
+  public MQBookInfo() {
   }
 }

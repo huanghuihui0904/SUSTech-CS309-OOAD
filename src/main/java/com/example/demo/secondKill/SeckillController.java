@@ -46,7 +46,7 @@ public class SeckillController {
 
   Calendar calendar = Calendar.getInstance();
 @PostMapping()
-  public String sec(@RequestBody MQBookInfo bookInfo)  {
+  public boolean sec(@RequestBody MQBookInfo bookInfo)  {
 
     String message = null;
   System.out.println(bookInfo.roomtypeid);
@@ -54,7 +54,7 @@ public class SeckillController {
   if(redisUtil.hasKey(bookInfo.roomtypeid+"")){
 
   }else {
-    return "no this roomtypeid";
+    return false;
   }
     Long decrByResult = redisUtil.decrBy(bookInfo.roomtypeid);
 //    seckillOrderInfo seckillorderinfo=new seckillOrderInfo(username,goodsname);
@@ -68,14 +68,16 @@ public class SeckillController {
 
       //发消息给订单消息队列，创建订单
       rabbitTemplate.convertAndSend(MyRabbitMQConfig.ORDER_EXCHANGE, MyRabbitMQConfig.ORDER_ROUTING_KEY, bookInfo);
-      message = "酒店" + bookInfo.hotelName+" 房型 "+bookInfo.roomType + "秒杀成功";
+return true;
+      //      message = "酒店" + bookInfo.hotelName+" 房型 "+bookInfo.roomType + "秒杀成功";
     } else {
       /**
        * 说明该商品的库存量没有剩余，直接返回秒杀失败的消息给用户
        */
-      message ="酒店" + bookInfo.hotelName+" 房型 "+bookInfo.roomType + "秒杀商品的库存量没有剩余,秒杀结束";
+      return false;
+//      message ="酒店" + bookInfo.hotelName+" 房型 "+bookInfo.roomType + "秒杀商品的库存量没有剩余,秒杀结束";
     }
-    return message;
+
   }
 
 }

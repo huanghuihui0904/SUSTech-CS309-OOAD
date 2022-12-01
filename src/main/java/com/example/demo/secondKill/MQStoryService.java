@@ -31,7 +31,7 @@
 //     */
 //    System.out.println("减库存");
 ////    log.info("减库存");
-////    Service.decrByOrder(info.getGoodsname());
+//    Service.decrByOrder(info.getGoodsname());
 //  }
 //}
 //
