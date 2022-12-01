@@ -4,6 +4,7 @@ import com.example.demo.RedisUtil;
 import com.example.demo.controller.OrdersHandler;
 import com.example.demo.entity.*;
 import com.example.demo.repository.*;
+import io.lettuce.core.ScriptOutputType;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -56,25 +57,28 @@ public class SeckillController {
 
   }else {
     return ResponseEntity.status(201).body(false);
+
   }
+  System.out.println("0000000");
     Long decrByResult = redisUtil.decrBy(bookInfo.roomtypeid);
 //    seckillOrderInfo seckillorderinfo=new seckillOrderInfo(username,goodsname);
     if (decrByResult >= 0) {
       /**
        * 说明该商品的库存量有剩余，可以进行下订单操作
        */
-
+      System.out.println("111111111111111111111");
       //发消息给库存消息队列，将库存数据减一
 //      rabbitTemplate.convertAndSend(MyRabbitMQConfig.STORY_EXCHANGE, MyRabbitMQConfig.STORY_ROUTING_KEY, bookInfo.roomtypeid);
 
       //发消息给订单消息队列，创建订单
-      rabbitTemplate.convertAndSend(MyRabbitMQConfig.ORDER_EXCHANGE, MyRabbitMQConfig.ORDER_ROUTING_KEY, bookInfo);
-return ResponseEntity.status(200).body(false);
+      rabbitTemplate.convertAndSend("hello",bookInfo);
+return ResponseEntity.status(200).body(true);
       //      message = "酒店" + bookInfo.hotelName+" 房型 "+bookInfo.roomType + "秒杀成功";
     } else {
       /**
        * 说明该商品的库存量没有剩余，直接返回秒杀失败的消息给用户
        */
+      System.out.println("999999999999999");
       return ResponseEntity.status(201).body(false);
 //      message ="酒店" + bookInfo.hotelName+" 房型 "+bookInfo.roomType + "秒杀商品的库存量没有剩余,秒杀结束";
     }

@@ -29,6 +29,7 @@ import java.util.Objects;
 //下订单
 @Service
 @Slf4j
+@RabbitListener(queues = "hello")
 public class MQOrderService {
   @Autowired
   RedisUtil redisUtil;
@@ -54,9 +55,9 @@ public class MQOrderService {
 //   *
 //   * @param id
 //   */
-  @RabbitListener(queues = MyRabbitMQConfig.ORDER_QUEUE)
+@RabbitHandler
   public void booking(MQBookInfo bookInfo) throws ParseException {
-
+    System.out.println("-----");
     Integer maxId=jdbcTemplate.queryForObject("select MAX(orderid) from orders", Integer.class);
     if (maxId==null)maxId=0;
     SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
