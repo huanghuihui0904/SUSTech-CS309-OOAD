@@ -559,20 +559,7 @@ public class OrdersHandler {
     @PostMapping("/booking")
     public boolean booking(@RequestBody BookInfo bookInfo) throws ParseException {
 
-        RoomType rt=roomTypeRepository.findRoomTypeByRoomname(bookInfo.roomType);
-        if(redisUtil.hasKey(rt.getRoomtypeid()+"")){
-            if(redisUtil.get(rt.getRoomtypeid()+"")!=null){
-                if(Integer.parseInt(redisUtil.get(rt.getRoomtypeid()+"").toString())>0){
-                    redisUtil.decrBy(rt.getRoomtypeid());
-                }else {
-                    return false;
-                }
-            }else {
 
-            }
-        }else {
-
-        }
 
 
         Integer maxId=jdbcTemplate.queryForObject("select MAX(orderid) from orders", Integer.class);
@@ -605,7 +592,21 @@ public class OrdersHandler {
         }
 
         Integer roomtypeid=roomtype.getRoomtypeid();
+//
+        if(redisUtil.hasKey(roomtypeid+"")){
+            if(redisUtil.get(roomtypeid+"")!=null){
+                if(Integer.parseInt(redisUtil.get(roomtypeid+"").toString())>0){
+                    redisUtil.decrBy(roomtypeid);
+                }else {
+                    return false;
+                }
+            }else {
 
+            }
+        }else {
+
+        }
+        //
         String startDate=bookInfo.getStartDate();
 
         String endDate=bookInfo.getEndDate();

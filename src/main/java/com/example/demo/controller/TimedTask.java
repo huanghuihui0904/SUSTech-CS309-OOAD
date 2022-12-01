@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 
+import com.example.demo.RedisUtil;
 import com.example.demo.entity.Event;
 import com.example.demo.entity.Room;
 import com.example.demo.entity.RoomType;
@@ -8,12 +9,14 @@ import com.example.demo.repository.EventRepository;
 import com.example.demo.repository.RoomRepository;
 import com.example.demo.repository.RoomTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.relational.core.sql.In;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -29,7 +32,8 @@ public class TimedTask {
     RoomTypeRepository roomTypeRepository;
     @Autowired
     RoomRepository roomRepository;
-
+    @Autowired
+    private RedisUtil redisutil;
     @Autowired
     JdbcTemplate jdbcTemplate;
 
@@ -85,7 +89,7 @@ public class TimedTask {
         event.setBegintime(format.format(now));
         Date d = new Date(now.getTime() + 24 * 60 * 60 * 1000 - 1);
         event.setEndtime(format.format(d));
-        event.setDiscountprice(0.9);
+        event.setDiscountprice(0.5);
 
         // 定时发送消息
         String roomTypeName = roomType.getRoomname();
@@ -99,7 +103,7 @@ public class TimedTask {
         String curDate = year + "-" + month + "-" + day;
         String discountMessage = "为回馈新老顾客的支持, “" +
                 hotelName + "”酒店" + roomTypeName +
-                "即刻开始打9折促销，速来体验吧！" + "持续时间至" + endTimeStr;
+                "即刻开始打五折促销，速来体验吧！" + "持续时间至" + endTimeStr;
         for (int i = 1; i <= maxCustomerId; i++) {   //遍历所有顾客
             jdbcTemplate.update("insert into message(messageFromId, messageFromName, messageToId, messageTime, content) " +
                     "values (?, ?, ?, ?, ?);", 10000, "BOT", i, curDate, discountMessage);
@@ -108,13 +112,12 @@ public class TimedTask {
 
         event.setEventid(maxId + 1);
         Event result = eventRepository.save(event);
+        String key=result.getRoomtypeid().toString();
+String[] remain=roomType.getRemain().split(",");
+        int actremain= Integer.parseInt(remain[1]);
+        redisutil.set(key, actremain, 86400);
         return event + "\ninsert ok";
-        //        System.out.println("TimedTask");
-//        System.out.println(format.format(now));
-//        Date d=new Date(now.getTime()+2*24*60*60*1000);
-//        System.out.println(format.format(d));
 
-//        System.out.println(new Date().getTime());
     }
 
 }

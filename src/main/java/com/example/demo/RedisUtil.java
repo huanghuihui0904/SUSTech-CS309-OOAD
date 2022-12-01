@@ -95,6 +95,7 @@ public class RedisUtil implements Serializable {
    * @return 值
    */
   public Object get(String key){
+
     return redisTemplate.opsForValue().get(key);
   }
 
