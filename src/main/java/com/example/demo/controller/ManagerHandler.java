@@ -42,24 +42,31 @@ public class ManagerHandler {
   @GetMapping("/orderedRoomNums")
   public int getOrderedRoomNums() {
 
-    List<Room> rooms=roomRepository.findAll();
-    int num=0;
-    for (int i = 0; i < rooms.size(); i++) {
-      String isorder=rooms.get(i).getIsordered();
-      String[] orders=isorder.split(",");
-      for (int j = 0; j <orders.length ; j++) {
-        if(orders[j].equals("1")){
-          num++;
-        }
-      }
-    }
+List<Orders> os=ordersRepository.findAll();
+int num=os.size();
+//    List<Room> rooms=roomRepository.findAll();
+//    int num=0;
+//    for (int i = 0; i < rooms.size(); i++) {
+//      String isorder=rooms.get(i).getIsordered();
+//      String[] orders=isorder.split(",");
+//      for (int j = 0; j <orders.length ; j++) {
+//        if(orders[j].equals("1")){
+//          num++;
+//        }
+//      }
+//    }
     return num;
   }
 
   @GetMapping("/currentCustomer")
   public int getCurrentCustomer() {
-    Integer nums = jdbcTemplate.queryForObject("select count(*) from orders where checkouttime is null;", Integer.class);
-    return nums;
+    List<Orders> os=ordersRepository.findAll();
+    int num=0;
+    for (int i = 0; i < os.size(); i++) {
+      RoomType rt=roomTypeRepository.findRoomTypeByRoomtypeid(os.get(i).getRoomtypeid());
+      num+=rt.getNumber();
+    }
+    return num;
   }
 
   @GetMapping("/hotRoomType")
