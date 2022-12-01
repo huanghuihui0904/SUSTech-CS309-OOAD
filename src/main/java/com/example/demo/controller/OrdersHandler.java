@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 
+import com.example.demo.RedisUtil;
 import com.example.demo.entity.*;
 import com.example.demo.repository.*;
 import lombok.Data;
@@ -32,7 +33,8 @@ public class OrdersHandler {
     @Autowired
     CommentRepository commentRepository;
 
-
+@Autowired
+    RedisUtil redisUtil;
     @Autowired
     JdbcTemplate jdbcTemplate;
 
@@ -406,13 +408,159 @@ public class OrdersHandler {
 
 
 
+    @PostMapping("/bookroom")
+    public boolean bookroom(@RequestBody BookroomInfo bookroomInfo) throws ParseException {
+        Integer maxId=jdbcTemplate.queryForObject("select MAX(orderid) from orders", Integer.class);
+        if (maxId==null)maxId=0;
+        SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        String roomTypeName= bookroomInfo.getRoomType();
+        String hotelName=bookroomInfo.getHotelName();
+        String userName=bookroomInfo.getUsername();
+        Integer cost=bookroomInfo.getCost();
+        String roomlocation=bookroomInfo.getLocation();
+
+        Customer customer=customerRepository.findByName(userName);
+        Hotel hotel=hotelRepository.findHotelByHotelname(hotelName);
+
+        Integer customerid=customer.getCustomerid();
+        Integer hotelid=hotel.getHotelid();
+        List<RoomType> roomTypeList=roomTypeRepository.findRoomTypesByHotelid(hotelid);
+        if (roomTypeList == null){
+            return false;
+        }
+        RoomType roomtype = null;
+        for (RoomType r: roomTypeList) {
+            if (Objects.equals(r.getRoomname(), roomTypeName)){
+                roomtype=r;
+                break;
+            }
+        }
+        if ( roomtype==null){
+            return false;
+        }
+
+        Integer roomtypeid=roomtype.getRoomtypeid();
+
+        String startDate=bookroomInfo.getStartDate();
+
+        String endDate=bookroomInfo.getEndDate();
+        Date checkin=format.parse(startDate);
+        Date checkout=format.parse(endDate);
+        Date now1=new Date();
+        String now1String=format.format(now1);
+        String nowString=now1String.substring(0,11)+"00:00:00";
+        Date now=format.parse(nowString);
+
+        int startIndex= (int) ((checkin.getTime()-now.getTime())/(1000*60*60*24));
+        int endIndex=(int) ((checkout.getTime()-now.getTime())/(1000*60*60*24))-1;
+
+        Room room=roomRepository.findRoomByLocation(roomlocation);
+        if (room==null|| !Objects.equals(roomtypeid, room.getRoomtypeid())){
+            System.out.println("No room or Room error");
+            return false;
+        }
+        String remain=roomtype.getRemain();
+        System.out.println("Remain: "+remain);
+        String[] remains=remain.split(",");
+        String isOrdered=room.getIsordered();
+
+
+        if (isOrdered.substring(startIndex*2, 2*endIndex+2).contains("1")){
+            System.out.println("No room");
+            return false;
+        }
+
+
+        StringBuilder currentIsordered= new StringBuilder();
+        StringBuilder currentRemain= new StringBuilder();
+
+
+        for (int i = startIndex; i <=endIndex ; i++) {
+            currentIsordered.append("1,");
+            int cur=Integer.parseInt(remains[i])-1;
+            currentRemain.append(cur).append(",");
+        }
+        String remainFin="";
+        String isOrderedFin="";
+
+        if (endIndex>=remain.length()) {
+
+            remainFin = remain.substring(0, startIndex*2) + currentRemain.substring(0,currentRemain.length()-1) ;
+            isOrderedFin=isOrdered.substring(0,startIndex*2)+currentIsordered.substring(0,currentIsordered.length()-1);
+        }else {
+            System.out.println("remain.substring(0, startIndex*2) "+remain.substring(0, startIndex*2) );
+            System.out.println("currentRemain"+currentRemain);
+            System.out.println("remain.substring(2*endIndex+1)"+remain.substring(2*endIndex+2));
+            remainFin = remain.substring(0, startIndex*2) + currentRemain + remain.substring(2*endIndex+2);
+            System.out.println("isOrdered.substring(0, startIndex*2) "+isOrdered.substring(0, startIndex*2) );
+            System.out.println("currentisOrdered"+currentIsordered);
+            System.out.println("isOrdered.substring(2*endIndex+1)"+isOrdered.substring(2*endIndex+2));
+            isOrderedFin=isOrdered.substring(0,startIndex*2)+currentIsordered+isOrdered.substring(2*endIndex+2);
+        }
+
+        System.out.println(remainFin);
+        System.out.println(isOrderedFin);
+
+
+        if (customer.getMoney()<cost){
+            return false;
+        }
+        //订房扣钱
+        String sql1 = "update customer set money=? where customerid=?";
+        jdbcTemplate.update(sql1,customer.getMoney()-cost,customerid);
+
+        //订房加积分
+        String sql2 = "update customer set credits=? where customerid=?";
+        jdbcTemplate.update(sql2,customer.getCredits()+cost,customerid);
+
+        //订房，修改remain
+        String sql3 = "update roomtype set remain=? where roomtypeid=?";
+        jdbcTemplate.update(sql3,remainFin,roomtypeid);
+
+        //订房，修改isordered
+        String sql4 = "update room set isordered=? where roomid=?";
+        jdbcTemplate.update(sql4,isOrderedFin,room.getRoomid());
+
+
+
+        Orders orders=new Orders();
+        orders.setOrderid(maxId+1);
+        orders.setCustomerid(customerid);
+        orders.setHotelid(hotelid);
+        orders.setRoomtypeid(roomtypeid);
+        orders.setRoomid(room.getRoomid());
+        String ordertime=format.format(now);
+        orders.setOrdertime(ordertime);
+        orders.setCheckintime(bookroomInfo.getStartDate());
+        orders.setCheckouttime(bookroomInfo.getEndDate());
+        orders.setAmountpaid(cost);
+
+        //订房增加order
+        ordersRepository.save(orders);
+
+        return true;
+    }
+
+
 
     @PostMapping("/booking")
-    public boolean booking(@RequestBody bookInfo bookInfo) throws ParseException {
+    public boolean booking(@RequestBody BookInfo bookInfo) throws ParseException {
 
+        RoomType rt=roomTypeRepository.findRoomTypeByRoomname(bookInfo.roomType);
+        if(redisUtil.hasKey(rt.getRoomtypeid()+"")){
+            if(redisUtil.get(rt.getRoomtypeid()+"")!=null){
+                if(Integer.parseInt(redisUtil.get(rt.getRoomtypeid()+"").toString())>0){
+                    redisUtil.decrBy(rt.getRoomtypeid());
+                }else {
+                    return false;
+                }
+            }else {
 
+            }
+        }else {
 
-
+        }
 
 
         Integer maxId=jdbcTemplate.queryForObject("select MAX(orderid) from orders", Integer.class);
@@ -463,7 +611,7 @@ public class OrdersHandler {
         List<Room> roomList=roomRepository.findRoomsByRoomtypeid(roomtypeid);
         Room room=null;
         for (Room r:roomList) {
-            String isOrderedInterval=r.getIsordered().substring(startIndex,endIndex+2);
+            String isOrderedInterval=r.getIsordered().substring(startIndex*2,2*endIndex+2);
             if (!isOrderedInterval.contains("1")){
                 System.out.println("R:"+isOrderedInterval);
                 room=r;
@@ -474,15 +622,13 @@ public class OrdersHandler {
             System.out.println("No room");
             return false;
         }
-
-
-
         String remain=roomtype.getRemain();
         System.out.println("Remain: "+remain);
         String[] remains=remain.split(",");
         String isOrdered=room.getIsordered();
 
-        if (remain.substring(0, startIndex*2).contains("0")){
+        if (remain.substring(startIndex*2, 2*endIndex+2).contains("0")){
+            System.out.println("No room");
             return false;
         }
 
@@ -539,16 +685,13 @@ public class OrdersHandler {
 
         addOrders(bookInfo,room.getRoomid(),roomtypeid);
 
-
-
-
         return true;
     }
 
 
 
 
-    public void addOrders(bookInfo bookInfo,Integer roomid,Integer roomtypeid) throws ParseException {
+    public void addOrders(BookInfo bookInfo, Integer roomid, Integer roomtypeid) throws ParseException {
         Integer maxId=jdbcTemplate.queryForObject("select MAX(orderid) from orders", Integer.class);
         if (maxId==null)maxId=0;
 
@@ -899,13 +1042,26 @@ public class OrdersHandler {
 
     @Data
     static
-    class bookInfo{
+    class BookInfo {
         String startDate;
         String endDate;
         String roomType;
         String hotelName;
         Integer cost;
         String username;
+
+    }
+
+    @Data
+    static
+    class BookroomInfo {
+        String startDate;
+        String endDate;
+        String roomType;
+        String hotelName;
+        Integer cost;
+        String username;
+        String location;
 
     }
 
