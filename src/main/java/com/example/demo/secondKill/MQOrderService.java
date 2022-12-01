@@ -91,20 +91,20 @@ public void booking(MQBookInfo bookInfo) throws ParseException {
 
   Integer roomtypeid=roomtype.getRoomtypeid();
 //
-  if(redisUtil.hasKey(roomtypeid+"")){
-    if(redisUtil.get(roomtypeid+"")!=null){
-      if(Integer.parseInt(redisUtil.get(roomtypeid+"").toString())>=0){
-        redisUtil.decrBy(roomtypeid);
-      }else {
-        System.out.println("jjjjjjj");
-        return ;
-      }
-    }else {
-
-    }
-  }else {
-
-  }
+//  if(redisUtil.hasKey(roomtypeid+"")){
+//    if(redisUtil.get(roomtypeid+"")!=null){
+//      if(Integer.parseInt(redisUtil.get(roomtypeid+"").toString())>=0){
+//        redisUtil.decrBy(roomtypeid);
+//      }else {
+//        System.out.println("jjjjjjj");
+//        return ;
+//      }
+//    }else {
+//
+//    }
+//  }else {
+//
+//  }
   //
   String startDate=bookInfo.getStartDate();
 
