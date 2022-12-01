@@ -48,7 +48,7 @@ public class TimedTask {
 
     //每次0点开始 持续24个小时抢当天的
     //0点更新 isordered和remain
-    @Scheduled(cron = "0 0 0 ? * *")
+    @Scheduled(cron = "0 30 0 ? * *")
 //    @Scheduled(cron = "0 4 20 28 11 ?")  //test only
     public String startJob() {
 
