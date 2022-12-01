@@ -88,6 +88,12 @@ if(roomType==null ||hotel==null){
     }
 
     RoomTypeWishList h=new RoomTypeWishList(hotelID,roomTypeID,userID);
+    List<RoomTypeWishList>hs=roomTypeWishListRepository.findAll();
+    for (int i = 0; i < hs.size(); i++) {
+      if(hs.get(i).getRoomtypeid()==roomTypeID&&hs.get(i).getCustomerid()==userID&&hs.get(i).getHotelid()==hotelID){
+        return "duplicate";
+      }
+    }
     roomTypeWishListRepository.save(h);
     return "insert ok";
 

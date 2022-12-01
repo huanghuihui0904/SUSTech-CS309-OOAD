@@ -72,6 +72,12 @@ public class HotelWishListHandler {
     System.out.println(hotelID);
     System.out.println(userID);
     HotelWishList h=new HotelWishList(hotelID,userID);
+    List<HotelWishList> hwl=hotelWishListRepository.findAll();
+    for (int i = 0; i <hwl.size() ; i++) {
+      if(hwl.get(i).getHotelid()==hotelID&&hwl.get(i).getCustomerid()==userID){
+        return "duplicate";
+      }
+    }
    hotelWishListRepository.save(h);
       return "insert ok";
 

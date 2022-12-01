@@ -2,10 +2,7 @@ package com.example.demo.controller;
 
 
 import com.example.demo.entity.*;
-import com.example.demo.repository.HotelRepository;
-import com.example.demo.repository.ManagerRepository;
-import com.example.demo.repository.OrdersRepository;
-import com.example.demo.repository.RoomTypeRepository;
+import com.example.demo.repository.*;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -30,7 +27,8 @@ public class ManagerHandler {
   ManagerRepository managerRepository;
   @Autowired
   OrdersRepository ordersRepository;
-
+@Autowired
+  RoomRepository roomRepository;
   @Autowired
   RoomTypeRepository roomTypeRepository;
 
@@ -43,8 +41,19 @@ public class ManagerHandler {
 
   @GetMapping("/orderedRoomNums")
   public int getOrderedRoomNums() {
-    Integer nums = jdbcTemplate.queryForObject("select count(*) from room where isordered=1;", Integer.class);
-    return nums;
+
+    List<Room> rooms=roomRepository.findAll();
+    int num=0;
+    for (int i = 0; i < rooms.size(); i++) {
+      String isorder=rooms.get(i).getIsordered();
+      String[] orders=isorder.split(",");
+      for (int j = 0; j <orders.length ; j++) {
+        if(orders[j].equals("1")){
+          num++;
+        }
+      }
+    }
+    return num;
   }
 
   @GetMapping("/currentCustomer")
